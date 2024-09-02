@@ -334,11 +334,11 @@ class KioskMachine {
     }
     public void cartPrint(String type, ArrayList<Item> item, int selectNo, ArrayList<Item> cart) {
         if (type.equals("cartInput")) {
-            System.out.println(item.get(selectNo).name + "를 고르셨습니다.");
+            System.out.println(item.get(selectNo).name + "을/를 고르셨습니다.");
             cart.add(item.get(selectNo));
             totalPrice += item.get(selectNo).price;
         } else if (type.equals("cancle")) {
-            System.out.println(cart.get(selectNo).name + "이 취소되었습니다.");
+            System.out.println(cart.get(selectNo).name + "가/이 취소되었습니다.");
             totalPrice -= cart.get(selectNo).price;
             cart.remove(cart.get(selectNo));
         }
