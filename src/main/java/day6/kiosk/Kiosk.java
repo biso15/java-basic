@@ -189,28 +189,23 @@ public class Kiosk {
 
                 System.out.print("어떤 버거를 고르시겠습니까 : ");  // 번호로 버거 선택
                 int selectNo = Integer.parseInt(scan.nextLine()) - 1;  // 선택한 번호로 버거 가져오기
-                kiosk.cartInput(kiosk.burgers, selectNo);
+                kiosk.cartPrint("cartInput",kiosk.burgers, selectNo, kiosk.burgerCart);
 
             } else if (menu == 2) {
                 System.out.println("==== 사이드 목록=====");
                 kiosk.print("menu", kiosk.sides);
 
-                System.out.print("어떤 사이드를 고르시겠습니까 : ");  // 번호로 버거 선택
+                System.out.print("어떤 사이드를 고르시겠습니까 : ");
                 int selectNo = Integer.parseInt(scan.nextLine()) - 1;
-                kiosk.sideCart.add(kiosk.sides.get(selectNo));
+                kiosk.cartPrint("cartInput",kiosk.sides, selectNo, kiosk.sideCart);
 
-                System.out.println(kiosk.sides.get(selectNo).name + "를 고르셨습니다.");
-                kiosk.totalPrice += kiosk.sides.get(selectNo).price;
             } else if (menu == 3) {
                 System.out.println("==== 음료수 목록=====");
                 kiosk.print("menu", kiosk.drinks);
 
-                System.out.print("어떤 음료수를 고르시겠습니까 : ");  // 번호로 버거 선택
+                System.out.print("어떤 음료수를 고르시겠습니까 : ");
                 int selectNo = Integer.parseInt(scan.nextLine()) - 1;
-                kiosk.drinkCart.add(kiosk.drinks.get(selectNo));
-
-                System.out.println(kiosk.drinks.get(selectNo).name + "를 고르셨습니다.");
-                kiosk.totalPrice += kiosk.drinks.get(selectNo).price;
+                kiosk.cartPrint("cartInput",kiosk.drinks, selectNo, kiosk.drinkCart);
             } else if (menu == 4) {
                 System.out.println("어떤 메뉴를 취소하겠습니까?");
                 System.out.println("1. 버거");
@@ -223,30 +218,23 @@ public class Kiosk {
                     kiosk.print("itemSelect", kiosk.burgerCart);
 
                     selectNo = Integer.parseInt(scan.nextLine()) - 1;
-                    System.out.println(kiosk.burgerCart.get(selectNo).name + "이 취소되었습니다.");
-                    kiosk.totalPrice -= kiosk.burgerCart.get(selectNo).price;
-                    kiosk.burgerCart.remove(kiosk.burgerCart.get(selectNo));
+                    kiosk.cartPrint("cancle",kiosk.burgers, selectNo, kiosk.burgerCart);
                 } else if (selectNo == 2) {
                     kiosk.print("itemSelect", kiosk.sideCart);
 
                     selectNo = Integer.parseInt(scan.nextLine()) - 1;
-                    System.out.println(kiosk.sideCart.get(selectNo).name + "이 취소되었습니다.");
-                    kiosk.totalPrice -= kiosk.sideCart.get(selectNo).price;
-                    kiosk.sideCart.remove(kiosk.sideCart.get(selectNo));
+                    kiosk.cartPrint("cancle",kiosk.sides, selectNo, kiosk.sideCart);
                 } else if (selectNo == 3) {
                     kiosk.print("itemSelect", kiosk.drinkCart);
 
                     selectNo = Integer.parseInt(scan.nextLine()) - 1;
-                    System.out.println(kiosk.drinkCart.get(selectNo).name + "이 취소되었습니다.");
-                    kiosk.totalPrice -= kiosk.drinkCart.get(selectNo).price;
-                    kiosk.drinkCart.remove(kiosk.drinkCart.get(selectNo));
+                    kiosk.cartPrint("cancle",kiosk.drinks, selectNo, kiosk.drinkCart);
                 }
             } else if (menu == 5) {
                 System.out.print("정말 주문하시겠습니까?(y/n) ");
                 String order = scan.nextLine();
                 if (order.equals("y")) {
                     System.out.print("결재 금액을 입력해주세요 : ");
-
                     int money = Integer.parseInt(scan.nextLine());
 
                     if (money >= kiosk.totalPrice) {
@@ -256,31 +244,13 @@ public class Kiosk {
                         if (receipt.equals("y")) {
                             System.out.println("==== 영수증 ====");
                             System.out.print("버거 : [");
-                            for (int i = 0; i < kiosk.burgerCart.size(); i++) {
-                                if (i == kiosk.burgerCart.size() - 1) {
-                                    System.out.print(kiosk.burgerCart.get(i).name);
-                                    break;
-                                }
-                                System.out.print(kiosk.burgerCart.get(i).name + ", ");
-                            }
+                            kiosk.print("cart", kiosk.burgerCart);
                             System.out.println("]");
                             System.out.print("사이드 : [");
-                            for (int i = 0; i < kiosk.sideCart.size(); i++) {
-                                if (i == kiosk.sideCart.size() - 1) {
-                                    System.out.print(kiosk.sideCart.get(i).name);
-                                    break;
-                                }
-                                System.out.print(kiosk.sideCart.get(i).name + ", ");
-                            }
+                            kiosk.print("cart", kiosk.sideCart);
                             System.out.println("]");
                             System.out.print("음료수 : [");
-                            for (int i = 0; i < kiosk.drinkCart.size(); i++) {
-                                if (i == kiosk.drinkCart.size() - 1) {
-                                    System.out.print(kiosk.drinkCart.get(i).name);
-                                    break;
-                                }
-                                System.out.print(kiosk.drinkCart.get(i).name + ", ");
-                            }
+                            kiosk.print("cart", kiosk.drinkCart);
                             System.out.println("]");
                             System.out.println("총금액 : " + kiosk.totalPrice);
                             System.out.println("================");
@@ -333,7 +303,7 @@ class KioskMachine {
         Item d1 = new Item("콜라", 1000);
         Item d2 = new Item("에이드", 2000);
         Item d3 = new Item("커피", 1500);
-        Item d4 = new Item("쉐이크", 2400);
+        Item d4 = new Item("쉐이크", 2500);
 
         drinks.add(d1);
         drinks.add(d2);
@@ -361,33 +331,19 @@ class KioskMachine {
                 System.out.print(item.get(i).name + ", ");
             }
         }
-
     }
-
-    public void cartInput(ArrayList<Item> item, int selectNo) {
-        item.add(item.get(selectNo));
-
-        System.out.println(item.get(selectNo).name + "를 고르셨습니다.");
-        totalPrice += item.get(selectNo).price;
+    public void cartPrint(String type, ArrayList<Item> item, int selectNo, ArrayList<Item> cart) {
+        if (type.equals("cartInput")) {
+            System.out.println(item.get(selectNo).name + "을/를 고르셨습니다.");
+            cart.add(item.get(selectNo));
+            totalPrice += item.get(selectNo).price;
+        } else if (type.equals("cancle")) {
+            System.out.println(cart.get(selectNo).name + "가/이 취소되었습니다.");
+            totalPrice -= cart.get(selectNo).price;
+            cart.remove(cart.get(selectNo));
+        }
     }
 }
-
-//    int totalPrice = 0;
-//
-//    public void burgerPrint() {
-//        System.out.println("==== 햄버거 목록 ====");
-//        for (int i = 0; i < burgers.size(); i++) {
-//            System.out.println((i + 1) + ". " + burgers.get(i).name + " " + burgers.get(i).price);
-//        }
-//    }
-//
-//
-//
-//    public void totalPrice(int price) {
-//        totalPrice += price;
-//    }
-//
-//}
 
 class Item {
     String name;
