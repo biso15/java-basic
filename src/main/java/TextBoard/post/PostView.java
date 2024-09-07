@@ -1,4 +1,4 @@
-package TextBoard;
+package TextBoard.post;
 
 import java.util.ArrayList;
 
@@ -15,22 +15,22 @@ public class PostView {
         int startPostIndex = 3 * (nowPage - 1);
         ArrayList<Post> PagePosts = new ArrayList<>();
 
-        for (int i = startPostIndex; i < 3; i++) {
-            PagePosts.add(posts.get(startPostIndex));
-            startPostIndex++;
+        for (int i = startPostIndex; i < startPostIndex + 3; i++) {
+            PagePosts.add(posts.get(i));
         }
 
         // for문 변형
         for(Post post : PagePosts) {
-
-            int likeLength = getLikeByPostNumber(post, likes);
+// 주석해제
+//            int likeLength = getLikeByPostNumber(post, likes);
 
             System.out.println("==================");
             System.out.println("번호 : " + post.getNumber());
             System.out.println("제목 : " + post.getTitle());
             System.out.println("작성자 : " + post.getWriter());
             System.out.println("조회수 : " + post.getView());
-            System.out.println("좋아요 : " + likeLength);
+//            주석해제
+//            System.out.println("좋아요 : " + likeLength);
 
         }
         System.out.println("==================");
@@ -70,8 +70,9 @@ public class PostView {
         System.out.println("내용 : " + post.getContents());
         System.out.println("작성일 : " + post.getDate());
         System.out.println("작성자 : " + post.getWriter());
-        System.out.println("조회수 : " + post.getView());;
-        System.out.println("좋아요 : " + likeImage + " " + likeLength);
+        System.out.println("조회수 : " + post.getView());
+// 주석해제
+//        System.out.println("좋아요 : " + likeImage + " " + likeLength);
         System.out.println("==================");
 
         if (post.getComments().size() > 0) {

@@ -1,4 +1,4 @@
-package TextBoard;
+package TextBoard.member;
 
 public class Member {
     private String id;

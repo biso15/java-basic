@@ -1,7 +1,7 @@
-package TextBoard;
+package TextBoard.post;
 
+import TextBoard.member.*;
 import TextBoard.like.Like;
-import TextBoard.post.*;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -19,13 +19,6 @@ public class PostController {
 
     private int lastPost = 0;  // 가장 최신의 number값. number값의 고유성을 유지하기 위해 1씩 증가시킬 계획임.
 
-    private ArrayList<Member> members = new ArrayList<>();
-
-    private ArrayList<Like> likes = new ArrayList<>();
-
-    private Member member = new Member("","","");
-    private String memberInfo = "";
-
     private int nowPage = 1;
 
     // 값의 초기화는 대부분 생성자에서 해주는 것을 권장합니다. 다양한 로직 수행 가능합니다.
@@ -38,39 +31,11 @@ public class PostController {
             postRepository.save(p1);
         }
 
-        Member m1 = new Member("kd", "kd", "kildong");
-        Member m2 = new Member("ks", "ks", "kilsoon");
-
-        members.add(m1);
-        members.add(m2);
-
-        Like l1 = new Like(1, "kd", getnowDate());
-        Like l2 = new Like(1, "ks", getnowDate());
-        Like l3 = new Like(3, "kd", getnowDate());
-        Like l4 = new Like(1, "mj", getnowDate());
-        Like l5 = new Like(2, "kd", getnowDate());
-        Like l6 = new Like(2, "ks", getnowDate());
-        Like l7 = new Like(1, "jw", getnowDate());
-        Like l8 = new Like(3, "ks", getnowDate());
-        Like l9 = new Like(3, "mj", getnowDate());
-        Like l10 = new Like(1, "km", getnowDate());
-
-        likes.add(l1);
-        likes.add(l2);
-        likes.add(l3);
-        likes.add(l4);
-        likes.add(l5);
-        likes.add(l6);
-        likes.add(l7);
-        likes.add(l8);
-        likes.add(l9);
-        likes.add(l10);
     }
 
     // command : page
     public void page() {
-        ArrayList<Post> posts = postRepository.getPosts();
-        postView.printPostList(posts, nowPage);
+        list();
 
         while(true) {
 
@@ -83,23 +48,22 @@ public class PostController {
                     continue;
                 }
                 nowPage--;
-
-                posts = postRepository.getPosts();
-                postView.printPostList(posts, nowPage);
+                list();
 
             } else if (pageCom == 2) {
                 if (nowPage == 5) {
                     System.out.println("다음 페이지가 없습니다.");
                     continue;
                 }
-
                 nowPage++;
-
-                posts = postRepository.getPosts();
-                postView.printPostList(posts, nowPage);
-
+                list();
+            } else if (pageCom == 3) {
+                System.out.print("이동하실 페이지 번호를 입력해주세요 : ");
+                nowPage = Integer.parseInt(sc.nextLine());
+                list();
+            } else if (pageCom == 4) {
+                break;
             }
-
         }
     }
 
@@ -142,54 +106,55 @@ public class PostController {
     }
 
     // command : logout
-    public void logout() {
-
-        boolean checkLogin = checkLogin();
-
-        if (!checkLogin) {
-            System.out.println("로그인을 해주세요");
-            return;
-        }
-
-        System.out.print("로그아웃을 하시겠습니까? (y/n) : ");
-        String logout = sc.nextLine();
-
-        if (logout.equals("y")) {
-
-            member.setId("");
-            member.setPw("");
-            member.setName("");
-            memberInfo = "";
-
-            System.out.println("로그아웃이 완료되었습니다.");
-        }
-    }
+//    public void logout() {
+//
+//        boolean checkLogin = checkLogin();
+//
+//        if (!checkLogin) {
+//            System.out.println("로그인을 해주세요");
+//            return;
+//        }
+//
+//        System.out.print("로그아웃을 하시겠습니까? (y/n) : ");
+//        String logout = sc.nextLine();
+//
+//        if (logout.equals("y")) {
+//
+//            member.setId("");
+//            member.setPw("");
+//            member.setName("");
+//            memberInfo = "";
+//
+//            System.out.println("로그아웃이 완료되었습니다.");
+//        }
+//    }
 
     // command : login
-    public void login() {
-        boolean checkLogin = checkLogin();
-
-        if (checkLogin) {
-            System.out.println("로그아웃을 해주세요");
-            return;
-        }
-
-        System.out.print("아이디 : ");
-        String id = sc.nextLine();
-        System.out.print("비밀번호 : ");
-        String pw = sc.nextLine();
-
-        member = findMember(id, pw);
-
-        if (member == null) {
-            System.out.println("비밀번호를 틀렸거나 잘못된 회원정보입니다.");
-            return;
-        }
-
-        memberInfo = getMemberInfo(member.id, member.name);
-
-        System.out.println(member.name + "님 환영합니다!");
-    }
+    //주석해제
+//    public void login() {
+//        boolean checkLogin = checkLogin();
+//
+//        if (checkLogin) {
+//            System.out.println("로그아웃을 해주세요");
+//            return;
+//        }
+//
+//        System.out.print("아이디 : ");
+//        String id = sc.nextLine();
+//        System.out.print("비밀번호 : ");
+//        String pw = sc.nextLine();
+//
+//        member = findMember(id, pw);
+//
+//        if (member == null) {
+//            System.out.println("비밀번호를 틀렸거나 잘못된 회원정보입니다.");
+//            return;
+//        }
+//
+//        BoardAppmemberInfo = getMemberInfo(member.id, member.name);
+//
+//        System.out.println(member.name + "님 환영합니다!");
+//    }
 
     // command : signup
     public void signup() {
@@ -202,7 +167,7 @@ public class PostController {
         String name = sc.nextLine();
 
         Member u = new Member(id, pw, name);
-        members.add(u);
+        memberRepository.save(u);
 
         System.out.println("==== 회원 가입이 완료되었습니다. ====");
     }
@@ -261,16 +226,16 @@ public class PostController {
 
             } else if (detailNum == 2) {
 
-                boolean checkLogin = checkLogin();
-
-                if (!checkLogin) {
-                    System.out.println("로그인을 해주세요");
-                    continue;
-                }
+//                boolean checkLogin = checkLogin();
+//
+//                if (!checkLogin) {
+//                    System.out.println("로그인을 해주세요");
+//                    continue;
+//                }
 
                 // post 객체 안에 likes가 들어있는 경우
                 // Like like = findLikeById(post);
-                Like like = findLikeById(post, likes);
+                Like like = likeRepository.findLikeById(post, likes);
 
                 if (like == null) {
 
@@ -427,13 +392,14 @@ public class PostController {
     // command : add
     public void add() {
 
-        boolean checkLogin = checkLogin();
-
-        if (!checkLogin) {
-            System.out.println("로그인을 해주세요");
-            //  continue;  반복문 안에서 사용하던 continue는 메서드로 변경하면 return으로 변경
-            return;
-        }
+//        주석해제
+//        boolean checkLogin = checkLogin();
+//
+//        if (!checkLogin) {
+//            System.out.println("로그인을 해주세요");
+//            //  continue;  반복문 안에서 사용하던 continue는 메서드로 변경하면 return으로 변경
+//            return;
+//        }
 
         System.out.print("게시물 제목을 입력해주세요 : ");
         String title = sc.nextLine();
@@ -477,6 +443,10 @@ public class PostController {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss", Locale.KOREA);
         Timestamp ts = new Timestamp(System.currentTimeMillis());
         return sdf.format(ts.getTime());
+    }
+
+    public String getMemberInfo(String id, String name) {
+        return "[" + id + "(" + name + ")" + "]";
     }
 
 }

@@ -1,4 +1,4 @@
-package TextBoard;
+package TextBoard.post;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;

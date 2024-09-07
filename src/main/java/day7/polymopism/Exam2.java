@@ -1,4 +1,4 @@
-package day7;
+package day7.polymopism;
 
 public class Exam2 {
     public static void main(String[] args) {
@@ -39,10 +39,11 @@ class Warrior2 {
 }
 
 class Weapon2 {
-    String name = "무기";
+    String name;
 }
 
 class Sword2 extends Weapon2 {
+    // 메서드는 자기 자신의 메서드를 우선순위로 하지만 변수는 부모의 변수를 우선순위로 사용
     public Sword2() {
         name = "칼";
     }

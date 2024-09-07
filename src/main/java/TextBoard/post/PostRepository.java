@@ -1,6 +1,4 @@
-package TextBoard;
-
-import TextBoard.post.Post;
+package TextBoard.post;
 
 import java.util.ArrayList;
 

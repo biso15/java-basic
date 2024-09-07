@@ -2,7 +2,7 @@ package day8.accessModifer;
 
 // 문제 : 값이 출력되게 해주세요.
 
-public class Exma1 {
+public class Exam1 {
     public static void main(String[] args) {
         Person p1 = new Person();
         p1.setId(20);

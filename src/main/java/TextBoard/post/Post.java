@@ -1,4 +1,4 @@
-package TextBoard;
+package TextBoard.post;
 
 import java.util.ArrayList;
 
@@ -11,8 +11,6 @@ public class Post {
     private String writer;
 
     private ArrayList<Comment> comments = new ArrayList<>();
-    // post 객체 안에 likes가 들어있는 경우
-    // private ArrayList<Like> likes = new ArrayList<>();
 
     public Post (int number, String title, String contents, String date, int view, String writer) {
         setNumber(number);

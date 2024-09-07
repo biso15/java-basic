@@ -1,4 +1,4 @@
-package day7.casting;
+package day7.polymopism;
 
 public class LeeCorparation2 {
     public static void main(String[] args) {

@@ -1,10 +1,11 @@
-package TextBoard;
+package TextBoard.like;
+
+import java.util.SplittableRandom;
 
 public class Like {
-
-    int postNumber;
-    String memberId;
-    String date;
+    private int postNumber;
+    private String memberId;
+    private String date;
 
     public Like (int postNumber, String memberId, String date) {
         setPostNumber(postNumber);
