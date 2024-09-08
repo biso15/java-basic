@@ -1,30 +1,24 @@
 package TextBoard;
 
-import TextBoard.like.LikeController;
-import TextBoard.member.Member;
 import TextBoard.post.PostController;
 import TextBoard.member.MemberController;
+import TextBoard.like.LikeController;
 
 import java.util.Scanner;
 
 public class BoardApp {
 
-    private PostController postController = new PostController();
-    private MemberController memberController = new MemberController();
-    private LikeController likeController = new LikeController();
+    private static CommonRepository commonRepository = new CommonRepository();
+    private static PostController postController = new PostController();
+    private static MemberController memberController = new MemberController();
+    private static LikeController likeController = new LikeController();
+
     private Scanner sc = new Scanner(System.in);
-
-    private String memberInfo = "";
-    private Member member = new Member("","","");
-
-    public void setMember(Member member) {
-        this.member = member;
-    }
 
     public void run() {
 
         while(true) {
-            System.out.print("명령어를 입력해주세요" + memberInfo + " : ");
+            System.out.print("명령어를 입력해주세요" + commonRepository.getMemberInfo() + " : ");
             String command = sc.nextLine();
 
             if (command.equals("exit")) {
@@ -50,13 +44,13 @@ public class BoardApp {
                 postController.search();
 
             } else if (command.equals("signup")) {
-                postController.signup();
+                memberController.signup();
 
             } else if (command.equals("login")) {
-                //postController.login();
+                memberController.login();
 
             } else if (command.equals("logout")) {
-                //postController.logout();
+                memberController.logout();
 
             } else if (command.equals("sort")) {
                 postController.sort();
@@ -68,7 +62,35 @@ public class BoardApp {
         }
     }
 
-    public void setMemberInfo (String memberInfo) {
-        this.memberInfo = memberInfo;
+    public static CommonRepository getCommonRepository() {
+        return commonRepository;
+    }
+
+    public static void setCommonRepository(CommonRepository commonRepository) {
+        BoardApp.commonRepository = commonRepository;
+    }
+
+    public static PostController getPostController() {
+        return postController;
+    }
+
+    public static void setPostController(PostController postController) {
+        BoardApp.postController = postController;
+    }
+
+    public static MemberController getMemberController() {
+        return memberController;
+    }
+
+    public static void setMemberController(MemberController memberController) {
+        BoardApp.memberController = memberController;
+    }
+
+    public static LikeController getLikeController() {
+        return likeController;
+    }
+
+    public static void setLikeController(LikeController likeController) {
+        BoardApp.likeController = likeController;
     }
 }

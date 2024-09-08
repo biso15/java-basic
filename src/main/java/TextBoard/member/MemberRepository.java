@@ -10,12 +10,16 @@ public class MemberRepository {
         members.add(member);
     }
 
+    public Member findMember(String id, String pw) {
+        for(Member member : members) {
 
-    public boolean checkLogin(Member member) {
-
-        if (member.getId().equals("")) {
-            return false;
+//            // 논리연산자
+//            // 조건1 || 조건2 -> 조건1 조건2 둘 중 하나만 만족해도 실행
+//            // 조건1 && 조건2 -> 조건1 조건2가 동시에 만족(모두 만족)해야만 실행
+            if (id.equals(member.getId()) && pw.equals(member.getPw())) {
+                return member;
+            }
         }
-        return true;
+        return null;
     }
 }

@@ -1,8 +1,16 @@
 package TextBoard.post;
 
+import TextBoard.BoardApp;
+import TextBoard.CommonRepository;
+import TextBoard.like.LikeController;
+import TextBoard.like.LikeRepository;
+
 import java.util.ArrayList;
 
 public class PostView {
+
+    private LikeRepository likeRepository = LikeController.getLikeRepository();
+    private CommonRepository commonRepository = BoardApp.getCommonRepository();
 
     public void printPostList(ArrayList<Post> posts, int nowPage) {
 //        for (int i = 0; i < posts.size(); i++) {
@@ -21,16 +29,14 @@ public class PostView {
 
         // for문 변형
         for(Post post : PagePosts) {
-// 주석해제
-//            int likeLength = getLikeByPostNumber(post, likes);
+            int likeLength = likeRepository.getLikeByPostNumber(post);
 
             System.out.println("==================");
             System.out.println("번호 : " + post.getNumber());
             System.out.println("제목 : " + post.getTitle());
             System.out.println("작성자 : " + post.getWriter());
             System.out.println("조회수 : " + post.getView());
-//            주석해제
-//            System.out.println("좋아요 : " + likeLength);
+            System.out.println("좋아요 : " + likeLength);
 
         }
         System.out.println("==================");
@@ -58,9 +64,9 @@ public class PostView {
 //            }
 //        }
 
-        int likeLength = getLikeByPostNumber(post, likes);
+        int likeLength = likeRepository.getLikeByPostNumber(post);
 
-        if (findLikeById(post, likes) != null) {
+        if (likeRepository.findLikeById(post, commonRepository.getUser().getId()) != null) {
             likeImage = "♥";
         }
 
@@ -71,8 +77,7 @@ public class PostView {
         System.out.println("작성일 : " + post.getDate());
         System.out.println("작성자 : " + post.getWriter());
         System.out.println("조회수 : " + post.getView());
-// 주석해제
-//        System.out.println("좋아요 : " + likeImage + " " + likeLength);
+        System.out.println("좋아요 : " + likeImage + " " + likeLength);
         System.out.println("==================");
 
         if (post.getComments().size() > 0) {

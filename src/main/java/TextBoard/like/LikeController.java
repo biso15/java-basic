@@ -1,38 +1,43 @@
 package TextBoard.like;
 
-import java.util.ArrayList;
+import TextBoard.BoardApp;
+import TextBoard.post.PostController;
+
 
 public class LikeController {
 
     // post 객체 안에 likes가 들어있는 경우
     // private ArrayList<Like> likes = new ArrayList<>();
-    private LikeRepository likeRepository = new LikeRepository();
+    private static LikeRepository likeRepository = new LikeRepository();
+
+    private PostController postController = BoardApp.getPostController();
 
     public LikeController() {
 
-        LikeRepository likeRepository = new LikeRepository();
+        Like l1 = new Like(1, "kd", postController.getnowDate());
+        Like l2 = new Like(1, "ks", postController.getnowDate());
+        Like l3 = new Like(3, "kd", postController.getnowDate());
+        Like l4 = new Like(1, "mj", postController.getnowDate());
+        Like l5 = new Like(2, "kd", postController.getnowDate());
+        Like l6 = new Like(2, "ks", postController.getnowDate());
+        Like l7 = new Like(1, "jw", postController.getnowDate());
+        Like l8 = new Like(3, "ks", postController.getnowDate());
+        Like l9 = new Like(3, "mj", postController.getnowDate());
+        Like l10 = new Like(1, "km", postController.getnowDate());
 
-        Like l1 = new Like(1, "kd", getnowDate());
-        Like l2 = new Like(1, "ks", getnowDate());
-        Like l3 = new Like(3, "kd", getnowDate());
-        Like l4 = new Like(1, "mj", getnowDate());
-        Like l5 = new Like(2, "kd", getnowDate());
-        Like l6 = new Like(2, "ks", getnowDate());
-        Like l7 = new Like(1, "jw", getnowDate());
-        Like l8 = new Like(3, "ks", getnowDate());
-        Like l9 = new Like(3, "mj", getnowDate());
-        Like l10 = new Like(1, "km", getnowDate());
-
-        likes.add(l1);
-        likes.add(l2);
-        likes.add(l3);
-        likes.add(l4);
-        likes.add(l5);
-        likes.add(l6);
-        likes.add(l7);
-        likes.add(l8);
-        likes.add(l9);
-        likes.add(l10);
+        likeRepository.save(l1);
+        likeRepository.save(l2);
+        likeRepository.save(l3);
+        likeRepository.save(l4);
+        likeRepository.save(l5);
+        likeRepository.save(l6);
+        likeRepository.save(l7);
+        likeRepository.save(l8);
+        likeRepository.save(l9);
+        likeRepository.save(l10);
     }
 
+    public static LikeRepository getLikeRepository() {
+        return likeRepository;
+    }
 }

@@ -1,6 +1,5 @@
 package TextBoard.like;
 
-import TextBoard.member.Member;
 import TextBoard.post.Post;
 
 import java.util.ArrayList;
@@ -19,16 +18,25 @@ public class LikeRepository {
 //        return null;
 //    }
 
-    public Like findLikeById(Post post, ArrayList<Like> likes) {
+
+    public void save(Like like) {
+        likes.add(like);
+    }
+
+    public void delete(Like like) {
+        likes.remove(like);
+    }
+
+    public Like findLikeById(Post post, String userId) {
         for (Like like : likes) {
-            if (like.getMemberId().equals(member.getId()) && like.getPostNumber() == post.getNumber()) {
+            if (like.getMemberId().equals(userId) && like.getPostNumber() == post.getNumber()) {
                 return like;
             }
         }
         return null;
     }
 
-    public int getLikeByPostNumber (Post post, ArrayList<Like> likes) {
+    public int getLikeByPostNumber (Post post) {
         int likeLength = 0;
         for (Like like : likes) {
             if (like.getPostNumber() == (post.getNumber())) {
@@ -38,16 +46,11 @@ public class LikeRepository {
         return likeLength;
     }
 
-    public Member findMember(String id, String pw) {
-//        for(Member member : members) {
-//
-//            // 논리연산자
-//            // 조건1 || 조건2 -> 조건1 조건2 둘 중 하나만 만족해도 실행
-//            // 조건1 && 조건2 -> 조건1 조건2가 동시에 만족(모두 만족)해야만 실행
-//            if (id.equals(member.getId()) && pw.equals(member.getPw())) {
-//                return member;
-//            }
-//        }
-        return null;
+    public ArrayList<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(ArrayList<Like> likes) {
+        this.likes = likes;
     }
 }
