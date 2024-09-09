@@ -1,8 +1,9 @@
 package TextBoard.post;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Post {
+public class Post implements Serializable {
     private int number;
     private String title;
     private String contents;

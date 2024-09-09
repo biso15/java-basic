@@ -1,4 +1,4 @@
-package TextBoard;
+package day11;
 
 import java.util.ArrayList;
 

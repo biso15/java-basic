@@ -8,13 +8,12 @@ import java.util.Scanner;
 public class BoardApp {
 
     private static CommonRepository commonRepository = new CommonRepository();
-    private static PostController postController = new PostController();
     private static MemberController memberController = new MemberController();
+    private static PostController postController = new PostController();
 
     private Scanner sc = new Scanner(System.in);
 
-    public void run() {
-
+    public void run() throws NumberFormatException {
         while(true) {
             System.out.print("명령어를 입력해주세요" + commonRepository.getMemberInfo() + " : ");
             String command = sc.nextLine();

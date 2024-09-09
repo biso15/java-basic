@@ -27,7 +27,6 @@ public class PostController {
 
     private int lastPost = 0;  // 가장 최신의 number값. number값의 고유성을 유지하기 위해 1씩 증가시킬 계획임.
 
-
     // 값의 초기화는 대부분 생성자에서 해주는 것을 권장합니다. 다양한 로직 수행 가능합니다.
     public PostController () {
 
@@ -77,7 +76,6 @@ public class PostController {
 //        p.setContents(contents);
 
         postRepository.save(p);
-
         System.out.println("게시물이 등록되었습니다.");
 
     }
@@ -91,7 +89,7 @@ public class PostController {
     }
 
     // command : update
-    public void update() {
+    public void update(){
 
         while(true) {
             System.out.print("수정할 게시물 번호 : ");
@@ -124,8 +122,8 @@ public class PostController {
                 }
 
                 System.out.println("자신의 게시물만 수정/삭제 할 수 있습니다.");
-
                 break;
+
             } catch (NumberFormatException e) {
                 System.out.println("숫자를 입력해주세요.");
             }
@@ -243,100 +241,105 @@ public class PostController {
 
                 while(true) {
                     System.out.print("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 좋아요, 3. 수정, 4. 삭제, 5. 목록으로) : ");
+                    try {
+                        int detailNum = Integer.parseInt(sc.nextLine());
 
-                    int detailNum = Integer.parseInt(sc.nextLine());
+                        if (detailNum == 1) {
+                            System.out.print("댓글 내용 : ");
+                            String comment = sc.nextLine();
 
-                    if (detailNum == 1) {
-                        System.out.print("댓글 내용 : ");
-                        String comment = sc.nextLine();
+                            Comment c = new Comment(comment);
+                            post.setComments(c);
 
-                        Comment c = new Comment(comment);
-                        post.setComments(c);
+                            System.out.println("댓글이 성공적으로 등록되었습니다");
 
-                        System.out.println("댓글이 성공적으로 등록되었습니다");
-
-                        findLikeById = likeRepository.findLikeById(post, userId);
-                        postView.printPost(post, findLikeById);
-
-                    } else if (detailNum == 2) {
-
-                        boolean checkLogin = commonRepository.getCheckLogin();
-
-                        if (!checkLogin) {
-                            System.out.println("로그인을 해주세요");
-                            continue;
-                        }
-
-                        // post 객체 안에 likes가 들어있는 경우
-                        // Like like = findLikeById(post);
-                        findLikeById = likeRepository.findLikeById(post, userId);
-
-                        if (findLikeById == null) {
-
-                            Like l = new Like(post.getNumber(), userId, getnowDate());
-                            // post 객체 안에 likes가 들어있는 경우
-                            // post.setLike(l);
-                            likeRepository.save(l);
-                            post.setLikeLength(post.getLikeLength() + 1);
-
-                            System.out.println("해당 게시물을 좋아합니다.");
-
-                            postView.printPost(post, l);
-
-                            continue;
-                        }
-
-                        // post 객체 안에 likes가 들어있는 경우
-                        // post.getLike().remove(like);
-                        likeRepository.delete(findLikeById);
-                        post.setLikeLength(post.getLikeLength() - 1);
-
-                        System.out.println("해당 게시물의 좋아요를 해제합니다.");
-                        postView.printPost(post, null);
-
-                    } else if (detailNum == 3) {
-
-                        findLikeById = likeRepository.findLikeById(post, userId);
-                        if (userId.equals(post.getUserId())) {
-
-                            System.out.print("제목 : ");
-                            String title = sc.nextLine();
-                            System.out.print("내용 : ");
-                            String contents = sc.nextLine();
-
-                            post.setTitle(title);
-                            post.setContents(contents);
-
+                            findLikeById = likeRepository.findLikeById(post, userId);
                             postView.printPost(post, findLikeById);
 
-                            continue;
-                        }
+                        } else if (detailNum == 2) {
 
-                        System.out.println("자신의 게시물만 수정/삭제 할 수 있습니다.");
+                            boolean checkLogin = commonRepository.getCheckLogin();
 
-                    } else if (detailNum == 4) {
-
-                        String userName = commonRepository.getUser().getName();
-
-                        if (userId.equals(post.getUserId())) {
-                            System.out.print("정말 게시물을 삭제하시겠습니까? (y/n) : ");
-                            String delete = sc.nextLine();
-
-                            if (delete.equals("y")) {
-                                ArrayList<Post> posts = postRepository.getPosts();
-                                postRepository.delete(post);
-                                System.out.println(userName + "님의 " + post.getNumber() + "번 게시물을 삭제했습니다.");
-
-                                postView.printPostList(posts, commonRepository.getNowPage(), getMaxPage(posts.size()));
+                            if (!checkLogin) {
+                                System.out.println("로그인을 해주세요");
+                                continue;
                             }
+
+                            // post 객체 안에 likes가 들어있는 경우
+                            // Like like = findLikeById(post);
+                            findLikeById = likeRepository.findLikeById(post, userId);
+
+                            if (findLikeById == null) {
+
+                                Like l = new Like(post.getNumber(), userId, getnowDate());
+                                // post 객체 안에 likes가 들어있는 경우
+                                // post.setLike(l);
+                                likeRepository.save(l);
+                                post.setLikeLength(post.getLikeLength() + 1);
+
+                                System.out.println("해당 게시물을 좋아합니다.");
+
+                                postView.printPost(post, l);
+
+                                continue;
+                            }
+
+                            // post 객체 안에 likes가 들어있는 경우
+                            // post.getLike().remove(like);
+                            likeRepository.delete(findLikeById);
+                            post.setLikeLength(post.getLikeLength() - 1);
+
+                            System.out.println("해당 게시물의 좋아요를 해제합니다.");
+                            postView.printPost(post, null);
+
+                        } else if (detailNum == 3) {
+
+                            findLikeById = likeRepository.findLikeById(post, userId);
+                            if (userId.equals(post.getUserId())) {
+
+                                System.out.print("제목 : ");
+                                String title = sc.nextLine();
+                                System.out.print("내용 : ");
+                                String contents = sc.nextLine();
+
+                                post.setTitle(title);
+                                post.setContents(contents);
+
+                                postView.printPost(post, findLikeById);
+
+                                continue;
+                            }
+
+                            System.out.println("자신의 게시물만 수정/삭제 할 수 있습니다.");
+
+                        } else if (detailNum == 4) {
+
+                            String userName = commonRepository.getUser().getName();
+
+                            if (userId.equals(post.getUserId())) {
+                                System.out.print("정말 게시물을 삭제하시겠습니까? (y/n) : ");
+                                String delete = sc.nextLine();
+
+                                if (delete.equals("y")) {
+                                    ArrayList<Post> posts = postRepository.getPosts();
+                                    postRepository.delete(post);
+                                    System.out.println(userName + "님의 " + post.getNumber() + "번 게시물을 삭제했습니다.");
+
+                                    postView.printPostList(posts, commonRepository.getNowPage(), getMaxPage(posts.size()));
+                                }
+                                break;
+                            }
+
+                            System.out.println("자신의 게시물만 수정/삭제 할 수 있습니다.");
+
+                        } else if (detailNum == 5) {
+                            System.out.println("상세보기 화면을 빠져나갑니다.");
                             break;
                         }
-
-                        System.out.println("자신의 게시물만 수정/삭제 할 수 있습니다.");
-
-                    } else if (detailNum == 5) {
-                        System.out.println("상세보기 화면을 빠져나갑니다.");
                         break;
+
+                    } catch (NumberFormatException e) {
+                        System.out.println("숫자를 입력해주세요.");
                     }
                 }
                 break;
@@ -444,16 +447,21 @@ public class PostController {
                     list();
                 } else if (pageCom == 3) {
                     System.out.print("이동하실 페이지 번호를 입력해주세요 : ");
-                    int movePage = Integer.parseInt(sc.nextLine());
-                    int postSize = postRepository.getPosts().size();
+                    try {
+                        int movePage = Integer.parseInt(sc.nextLine());
+                        int postSize = postRepository.getPosts().size();
 
-                    if (movePage > getMaxPage(postSize)) {
-                        System.out.println("선택한 페이지가 없습니다.");
-                        continue;
+                        if (movePage > getMaxPage(postSize)) {
+                            System.out.println("선택한 페이지가 없습니다.");
+                            continue;
+                        }
+
+                        commonRepository.setNowPage(movePage);
+                        list();
+                        break;
+                    } catch (NumberFormatException e){
+                        System.out.println("숫자를 입력해주세요.");
                     }
-
-                    commonRepository.setNowPage(movePage);
-                    list();
 
                 } else if (pageCom == 4) {
                     break;

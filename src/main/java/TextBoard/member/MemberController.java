@@ -96,4 +96,7 @@ public class MemberController {
         }
     }
 
+    public static MemberRepository getMemberRepository() {
+        return memberRepository;
+    }
 }

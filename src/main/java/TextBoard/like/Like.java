@@ -1,6 +1,8 @@
 package TextBoard.like;
 
-public class Like {
+import java.io.Serializable;
+
+public class Like implements Serializable {
     private int postNumber;
     private String memberId;
     private String date;
