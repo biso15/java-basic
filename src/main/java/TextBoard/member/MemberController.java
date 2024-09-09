@@ -24,6 +24,13 @@ public class MemberController {
 
     // command : signup
     public void signup() {
+        boolean checkLogin = commonRepository.getCheckLogin();
+
+        if (checkLogin) {
+            System.out.println("로그아웃을 해주세요");
+            return;
+        }
+
         System.out.println("==== 회원 가입을 진행합니다 ====");
         System.out.print("아이디를 입력해주세요 : ");
         String id = sc.nextLine();

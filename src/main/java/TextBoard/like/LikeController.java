@@ -1,8 +1,9 @@
 package TextBoard.like;
 
 import TextBoard.BoardApp;
+import TextBoard.post.Post;
 import TextBoard.post.PostController;
-
+import TextBoard.post.PostRepository;
 
 public class LikeController {
 
@@ -11,6 +12,7 @@ public class LikeController {
     private static LikeRepository likeRepository = new LikeRepository();
 
     private PostController postController = BoardApp.getPostController();
+    private PostRepository postRepository = postController.getPostRepository();
 
     public LikeController() {
 
@@ -25,16 +27,25 @@ public class LikeController {
         Like l9 = new Like(3, "mj", postController.getnowDate());
         Like l10 = new Like(1, "km", postController.getnowDate());
 
-        likeRepository.save(l1);
-        likeRepository.save(l2);
-        likeRepository.save(l3);
-        likeRepository.save(l4);
-        likeRepository.save(l5);
-        likeRepository.save(l6);
-        likeRepository.save(l7);
-        likeRepository.save(l8);
-        likeRepository.save(l9);
-        likeRepository.save(l10);
+        save(l1);
+        save(l2);
+        save(l3);
+        save(l4);
+        save(l5);
+        save(l6);
+        save(l7);
+        save(l8);
+        save(l9);
+        save(l10);
+    }
+
+    public void save (Like l) {
+        likeRepository.save(l);
+        for (Post post : postRepository.getPosts()) {
+            if (post.getNumber() == l.getPostNumber()) {
+                post.setLikeLength(post.getLikeLength() + 1);
+            }
+        }
     }
 
     public static LikeRepository getLikeRepository() {

@@ -9,16 +9,20 @@ public class Post {
     private String date;
     private int view;
     private String writer;
+    private String userId;
+    private int likeLength;
 
     private ArrayList<Comment> comments = new ArrayList<>();
 
-    public Post (int number, String title, String contents, String date, int view, String writer) {
+    public Post (int number, String title, String contents, String date, int view, String userId, String writer, int likelength) {
         setNumber(number);
         setTitle(title);
         setContents(contents);
         setDate(date);
         setView(view);
+        setUserId(userId);
         setWriter(writer);
+        setLikeLength(likelength);
     }
 
     public void setNumber(int number) {
@@ -87,8 +91,23 @@ public class Post {
 //        return likes;
 //    }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public void increaseView() {
         this.view++;
     }
 
+    public int getLikeLength() {
+        return likeLength;
+    }
+
+    public void setLikeLength(int likeLength) {
+        this.likeLength = likeLength;
+    }
 }

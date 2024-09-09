@@ -2,7 +2,6 @@ package TextBoard;
 
 import TextBoard.post.PostController;
 import TextBoard.member.MemberController;
-import TextBoard.like.LikeController;
 
 import java.util.Scanner;
 
@@ -11,7 +10,6 @@ public class BoardApp {
     private static CommonRepository commonRepository = new CommonRepository();
     private static PostController postController = new PostController();
     private static MemberController memberController = new MemberController();
-    private static LikeController likeController = new LikeController();
 
     private Scanner sc = new Scanner(System.in);
 
@@ -66,31 +64,7 @@ public class BoardApp {
         return commonRepository;
     }
 
-    public static void setCommonRepository(CommonRepository commonRepository) {
-        BoardApp.commonRepository = commonRepository;
-    }
-
     public static PostController getPostController() {
         return postController;
-    }
-
-    public static void setPostController(PostController postController) {
-        BoardApp.postController = postController;
-    }
-
-    public static MemberController getMemberController() {
-        return memberController;
-    }
-
-    public static void setMemberController(MemberController memberController) {
-        BoardApp.memberController = memberController;
-    }
-
-    public static LikeController getLikeController() {
-        return likeController;
-    }
-
-    public static void setLikeController(LikeController likeController) {
-        BoardApp.likeController = likeController;
     }
 }

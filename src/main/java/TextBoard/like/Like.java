@@ -1,7 +1,5 @@
 package TextBoard.like;
 
-import java.util.SplittableRandom;
-
 public class Like {
     private int postNumber;
     private String memberId;

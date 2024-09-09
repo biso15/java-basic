@@ -18,7 +18,6 @@ public class LikeRepository {
 //        return null;
 //    }
 
-
     public void save(Like like) {
         likes.add(like);
     }
@@ -34,23 +33,5 @@ public class LikeRepository {
             }
         }
         return null;
-    }
-
-    public int getLikeByPostNumber (Post post) {
-        int likeLength = 0;
-        for (Like like : likes) {
-            if (like.getPostNumber() == (post.getNumber())) {
-                likeLength++;
-            }
-        }
-        return likeLength;
-    }
-
-    public ArrayList<Like> getLikes() {
-        return likes;
-    }
-
-    public void setLikes(ArrayList<Like> likes) {
-        this.likes = likes;
     }
 }
