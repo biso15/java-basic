@@ -1,6 +1,5 @@
 package TextBoard.post;
 
-import java.io.*;
 import java.util.ArrayList;
 
 // 창고 관리(Model)
@@ -11,15 +10,15 @@ public class PostRepository {
     public void save(Post post) {
         posts.add(post);
 
-        // ArrayList를 파일로 저장
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("posts.txt"));
-            oos.writeObject(getPosts());//파일에 ArrayList 저장
-            oos.close();
-            System.out.println("Post 정보가 파일에 저장되었습니다.");
-        } catch (Exception e) {
-            System.out.println("Post save fail");
-        }
+//        // ArrayList를 txt 파일로 저장
+//        try {
+//            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("posts.txt"));
+//            oos.writeObject(getPosts());//파일에 ArrayList 저장
+//            oos.close();
+//            System.out.println("Post 정보가 파일에 저장되었습니다.");
+//        } catch (Exception e) {
+//            System.out.println("Post save fail");
+//        }
     }
 
     // 자신이 가지고 있는 창고(ArrayList)의 내용물을 다른 누군가에게 전달
@@ -34,16 +33,6 @@ public class PostRepository {
     // 창고에서 특정 물건을 제거함
     public void delete(Post post) {
         posts.remove(post);
-
-        // ArrayList를 파일로 저장
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("posts.txt"));
-            oos.writeObject(getPosts());//파일에 ArrayList 저장
-            oos.close();
-            System.out.println("Post 정보가 파일에 저장되었습니다.");
-        } catch (Exception e) {
-            System.out.println("Post save fail");
-        }
     }
 
     public Post findPostByNumber(int num) {

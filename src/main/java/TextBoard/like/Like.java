@@ -7,10 +7,17 @@ public class Like implements Serializable {
     private String memberId;
     private String date;
 
+    // 기본 생성자
+    public Like () {}
+
     public Like (int postNumber, String memberId, String date) {
         setPostNumber(postNumber);
         setMemberId(memberId);
         setDate(date);
+    }
+
+    public String getDate() {
+        return date;
     }
 
     public void setPostNumber(int postNumber) {

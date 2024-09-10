@@ -1,26 +1,43 @@
 package TextBoard.post;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-
 public class Comment {
     private String contents;
     private String date;
+    private String memberId;
+    private int postNumber;
 
-    public Comment(String contents) {
+    // 기본 생성자
+    public Comment() {}
+
+    public Comment(String contents, String date, String memberId, int postNumber) {
         setContents(contents);
-        setDate();
+        setDate(date);
+        setMemberId(memberId);
+        setPostNumber(postNumber);
+    }
+
+    public int getPostNumber() {
+        return postNumber;
+    }
+
+    public void setPostNumber(int postNumber) {
+        this.postNumber = postNumber;
+    }
+
+    public String getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(String memberId) {
+        this.memberId = memberId;
     }
 
     public void setContents(String contents) {
         this.contents = contents;
     }
 
-    public void setDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss", Locale.KOREA);
-        Timestamp ts = new Timestamp(System.currentTimeMillis());
-        date = sdf.format(ts.getTime());
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public String getContents() {

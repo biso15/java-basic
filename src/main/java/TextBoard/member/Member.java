@@ -7,6 +7,9 @@ public class Member implements Serializable {
     private String pw;
     private String name;
 
+    // 기본 생성자
+    public Member() {}
+
     public Member(String id, String pw, String name) {
         setId(id);
         setPw(pw);

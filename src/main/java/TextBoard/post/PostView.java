@@ -75,7 +75,7 @@ public class PostView {
         System.out.println(nextPaging);
     }
 
-    public void printPost(Post post, Like findLikeById) {
+    public void printPost(Post post, Like findLikeById, ArrayList<Comment> comments) {
 
         String likeImage = "♡";
 
@@ -100,9 +100,9 @@ public class PostView {
         System.out.println("좋아요 : " + likeImage + " " + post.getLikeLength());
         System.out.println("==================");
 
-        if (post.getComments().size() > 0) {
+        if (comments.size() > 0) {
             System.out.println("======= 댓글 =======");
-            for (Comment comment : post.getComments()) {
+            for (Comment comment : comments) {
                 System.out.println("댓글 내용 : " + comment.getContents());
                 System.out.println("댓글 작성일 : " + comment.getDate());
                 System.out.println("==================");

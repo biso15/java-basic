@@ -1,17 +1,18 @@
 package TextBoard.member;
 
 import TextBoard.BoardApp;
-import TextBoard.CommonRepository;
+import TextBoard.CommonContainer;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MemberController {
 
-    private CommonRepository commonRepository = BoardApp.getCommonRepository();
+    private CommonContainer commonContainer = BoardApp.getCommonRepository();
 
     private static MemberRepository memberRepository = new MemberRepository();
 
@@ -19,12 +20,21 @@ public class MemberController {
 
     public MemberController() {
 
-        // 파일에서 ArrayList를 읽어오기
+        // Json 파일에서 ArrayList를 읽어오기
+        // Jackson ObjectMapper 생성
+        ObjectMapper mapper = new ObjectMapper();
+
         try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("members.txt"));
-            memberRepository.setMembers((ArrayList<Member>)ois.readObject());  // 파일에서 ArrayList읽기
-            ois.close();
-            System.out.println("Member 정보를 파일에서 읽었습니다.");
+            // JSON 파일을 ArrayList로 변환
+            ArrayList<Member> members = mapper.readValue(new File("src/main/java/TextBoard/json/members.json"), new TypeReference<ArrayList<Member>>() {});
+
+            // 레포지토리에 저장
+            for (Member member : members) {
+                memberRepository.save(member);
+            }
+
+            System.out.println("member JSON 파일을 ArrayList로 읽어왔습니다.");
+
         } catch (FileNotFoundException e) {
             Member m1 = new Member("kd", "kd", "kildong");
             Member m2 = new Member("ks", "ks", "kilsoon");
@@ -32,18 +42,19 @@ public class MemberController {
             memberRepository.save(m1);
             memberRepository.save(m2);
 
-            System.out.println("Member 임시 데이터 읽었습니다.");
+            commonContainer.saveToJson("src/main/java/TextBoard/json/members.json", memberRepository.getMembers());
+
+            System.out.println("Member 임시 데이터를 만들었습니다.");
+
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Member load fail");
         }
-
 
     }
 
     // command : signup
     public void signup() {
-        boolean checkLogin = commonRepository.getCheckLogin();
+        boolean checkLogin = commonContainer.getCheckLogin();
 
         if (checkLogin) {
             System.out.println("로그아웃을 해주세요");
@@ -60,13 +71,14 @@ public class MemberController {
 
         Member u = new Member(id, pw, name);
         memberRepository.save(u);
+        commonContainer.saveToJson("src/main/java/TextBoard/json/members.json", memberRepository.getMembers());
 
         System.out.println("==== 회원 가입이 완료되었습니다. ====");
     }
 
     // command : login
     public void login() {
-        boolean checkLogin = commonRepository.getCheckLogin();
+        boolean checkLogin = commonContainer.getCheckLogin();
 
         if (checkLogin) {
             System.out.println("로그아웃을 해주세요");
@@ -85,9 +97,9 @@ public class MemberController {
             return;
         }
 
-        commonRepository.setMemberInfo(member);
-        commonRepository.setUser(member);
-        commonRepository.setCheckLogin(true);
+        commonContainer.setMemberInfo(member);
+        commonContainer.setUser(member);
+        commonContainer.setCheckLogin(true);
 
         System.out.println(member.getName() + "님 환영합니다!");
     }
@@ -95,7 +107,7 @@ public class MemberController {
     // command : logout
     public void logout() {
 
-        boolean checkLogin = commonRepository.getCheckLogin();
+        boolean checkLogin = commonContainer.getCheckLogin();
 
         if (!checkLogin) {
             System.out.println("로그인을 해주세요");
@@ -107,15 +119,15 @@ public class MemberController {
 
         if (logout.equals("y")) {
 
-            commonRepository.setMemberInfo(null);
-            commonRepository.setUser(new Member("", "", ""));
-            commonRepository.setCheckLogin(false);
+            commonContainer.setMemberInfo(null);
+            commonContainer.setUser(new Member("", "", ""));
+            commonContainer.setCheckLogin(false);
 
             System.out.println("로그아웃이 완료되었습니다.");
         }
     }
 
-    public static MemberRepository getMemberRepository() {
+    public MemberRepository getMemberRepository() {
         return memberRepository;
     }
 }

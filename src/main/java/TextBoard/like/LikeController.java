@@ -1,13 +1,15 @@
 package TextBoard.like;
 
 import TextBoard.BoardApp;
+import TextBoard.CommonContainer;
 import TextBoard.post.Post;
 import TextBoard.post.PostController;
 import TextBoard.post.PostRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
 public class LikeController {
@@ -18,15 +20,25 @@ public class LikeController {
 
     private PostController postController = BoardApp.getPostController();
     private PostRepository postRepository = postController.getPostRepository();
+    private static CommonContainer commonContainer = BoardApp.getCommonRepository();
 
     public LikeController() {
 
-        // 파일에서 ArrayList를 읽어오기
+        // Json 파일에서 ArrayList를 읽어오기
+        // Jackson ObjectMapper 생성
+        ObjectMapper mapper = new ObjectMapper();
+
         try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("likes.txt"));
-            likeRepository.setLikes((ArrayList<Like>)ois.readObject());  // 파일에서 ArrayList읽기
-            ois.close();
-            System.out.println("Like 정보를 파일에서 읽었습니다.");
+            // JSON 파일을 ArrayList로 변환
+            ArrayList<Like> likes = mapper.readValue(new File("src/main/java/TextBoard/json/likes.json"), new TypeReference<ArrayList<Like>>() {});
+
+            // 레포지토리에 저장
+            for (Like like : likes) {
+                likeRepository.save(like);
+            }
+
+            System.out.println("like JSON 파일을 ArrayList로 읽어왔습니다.");
+
         } catch (FileNotFoundException e) {
             Like l1 = new Like(1, "kd", postController.getnowDate());
             Like l2 = new Like(1, "ks", postController.getnowDate());
@@ -50,14 +62,13 @@ public class LikeController {
             save(l9);
             save(l10);
 
-            System.out.println("Like 임시 데이터 읽었습니다.");
-        }
-        catch (Exception e) {
+            commonContainer.saveToJson("src/main/java/TextBoard/json/likes.json", likeRepository.getLikes());
+
+            System.out.println("Like 임시 데이터를 만들었습니다.");
+
+        } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Like load fail");
         }
-
-
     }
 
     public void save (Like l) {
@@ -67,6 +78,7 @@ public class LikeController {
                 post.setLikeLength(post.getLikeLength() + 1);
             }
         }
+
     }
 
     public static LikeRepository getLikeRepository() {

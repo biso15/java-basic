@@ -1,6 +1,5 @@
 package TextBoard.member;
 
-import java.io.*;
 import java.util.ArrayList;
 
 public class MemberRepository {
@@ -9,17 +8,6 @@ public class MemberRepository {
 
     public void save (Member member) {
         members.add(member);
-
-        // ArrayList를 파일로 저장
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("members.txt"));
-            oos.writeObject(getMembers());  // 파일에 ArrayList 저장
-            oos.close();
-            System.out.println("Member 정보가 파일에 저장되었습니다.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Member save fail");
-        }
     }
 
     public ArrayList<Member> getMembers() {

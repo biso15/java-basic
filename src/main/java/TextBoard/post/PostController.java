@@ -1,15 +1,15 @@
 package TextBoard.post;
 
 import TextBoard.BoardApp;
-import TextBoard.CommonRepository;
+import TextBoard.CommonContainer;
 import TextBoard.like.LikeController;
 import TextBoard.like.LikeRepository;
 import TextBoard.member.Member;
 import TextBoard.like.Like;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,45 +21,109 @@ public class PostController {
 
     private Scanner sc = new Scanner(System.in);
 
-    private CommonRepository commonRepository = BoardApp.getCommonRepository();
+    private CommonContainer commonContainer = BoardApp.getCommonRepository();
 
     private static PostRepository postRepository = new PostRepository();
     private static PostView postView = new PostView();
 
     private LikeRepository likeRepository = LikeController.getLikeRepository();
 
+    private CommentRepository commentRepository = new CommentRepository();
+
     private int lastPost = 0;  // 가장 최신의 number값. number값의 고유성을 유지하기 위해 1씩 증가시킬 계획임.
 
     // 값의 초기화는 대부분 생성자에서 해주는 것을 권장합니다. 다양한 로직 수행 가능합니다.
     public PostController () {
 
-        // 파일에서 ArrayList를 읽어오기
+        // Json 파일에서 ArrayList를 읽어오기
+        // Jackson ObjectMapper 생성
+        ObjectMapper mapper = new ObjectMapper();
+
         try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("posts.txt"));
-            postRepository.setPosts((ArrayList<Post>)ois.readObject());  // 파일에서 ArrayList읽기
-            ois.close();
-            System.out.println("Post 정보를 파일에서 읽었습니다.");
+            // JSON 파일을 ArrayList로 변환
+            ArrayList<Post> posts = mapper.readValue(new File("src/main/java/TextBoard/json/posts.json"), new TypeReference<ArrayList<Post>>() {});
+
+            // 레포지토리에 저장
+            for (Post post : posts) {
+                postRepository.save(post);
+            }
+
+            System.out.println("post JSON 파일을 ArrayList로 읽어왔습니다.");
+
         } catch (FileNotFoundException e) {
             for (int i = 0; i < 100; i++) {
                 int iValue = (int)(Math.random() * 100);
                 int iValue2 = (int)(Math.random() * 100);
-                Post p1 = new Post(i + 1, "안녕하세요 반갑습니다. java 공부중이에요." + i,"java 너무 재밌어요!!" + i, getnowDate(), iValue, "kd", "kildong", iValue2);
+                Post p = new Post(i + 1, "안녕하세요 반갑습니다. java 공부중이에요." + i,"java 너무 재밌어요!!" + i, getnowDate(), iValue, "kd", "kildong", iValue2);
 
-                postRepository.save(p1);
+                postRepository.save(p);
             }
             lastPost = 100;
-            System.out.println("Post 임시 데이터 읽었습니다.");
+
+            commonContainer.saveToJson("src/main/java/TextBoard/json/posts.json", postRepository.getPosts());
+
+            System.out.println("Post 임시 데이터를 만들었습니다.");
+
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Post load fail");
         }
 
+
+        try {
+            // JSON 파일을 ArrayList로 변환
+            ArrayList<Comment> comments = mapper.readValue(new File("src/main/java/TextBoard/json/comments.json"), new TypeReference<ArrayList<Comment>>() {});
+
+            // 레포지토리에 저장
+            for (Comment comment : comments) {
+                commentRepository.save(comment);
+            }
+
+            System.out.println("comment JSON 파일을 ArrayList로 읽어왔습니다.");
+
+        } catch (FileNotFoundException e) {
+
+            for (int i = 0; i < 10; i++) {
+                int iValue = (int)(Math.random() * 3);
+                Comment c = new Comment("안녕하세요 반갑습니다. 댓글이예요" + i, getnowDate(), "kd", iValue);
+
+                commentRepository.save(c);
+            }
+
+            commonContainer.saveToJson("src/main/java/TextBoard/json/comments.json", commentRepository.getComments());
+
+            System.out.println("Comment 임시 데이터를 만들었습니다.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+//        // txt 파일에서 ArrayList를 읽어오기
+//        try {
+//            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("posts.txt"));
+//            postRepository.setPosts((ArrayList<Post>)ois.readObject());  // 파일에서 ArrayList읽기
+//            ois.close();
+//            System.out.println("Post 정보를 파일에서 읽었습니다.");
+//        } catch (FileNotFoundException e) {
+//            for (int i = 0; i < 100; i++) {
+//                int iValue = (int)(Math.random() * 100);
+//                int iValue2 = (int)(Math.random() * 100);
+//                Post p1 = new Post(i + 1, "안녕하세요 반갑습니다. java 공부중이에요." + i,"java 너무 재밌어요!!" + i, getnowDate(), iValue, "kd", "kildong", iValue2);
+//
+//                postRepository.save(p1);
+//            }
+//            lastPost = 100;
+//            System.out.println("Post 임시 데이터 읽었습니다.");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.out.println("Post load fail");
+//        }
     }
 
     // command : add
     public void add() {
 
-        boolean checkLogin = commonRepository.getCheckLogin();
+        boolean checkLogin = commonContainer.getCheckLogin();
 
         if (!checkLogin) {
             System.out.println("로그인을 해주세요");
@@ -74,7 +138,7 @@ public class PostController {
 
         // 1부터 1씩 증가 -> 고유값 유지하는데 편리
         lastPost++;
-        Member user = commonRepository.getUser();
+        Member user = commonContainer.getUser();
         Post p = new Post(lastPost, title, contents, getnowDate(), 0, user.getId(), user.getName(), 0);
 
 //        Post p = new Post();
@@ -92,6 +156,7 @@ public class PostController {
 //        p.setContents(contents);
 
         postRepository.save(p);
+        commonContainer.saveToJson("src/main/java/TextBoard/json/posts.json", postRepository.getPosts());
         System.out.println("게시물이 등록되었습니다.");
 
     }
@@ -101,7 +166,7 @@ public class PostController {
         // 가장 상단에 정의할 수도 있지만, 그럴 경우 ArrayList에 변경사항이 있는 경우 새로고침이 되지 않으므로 사용할 때 불러와서 사용하는 것이 좋다.
         ArrayList<Post> posts = postRepository.getPosts();
         int realMaxPaging = getMaxPage(posts.size());
-        postView.printPostList(posts, commonRepository.getNowPage(), realMaxPaging);
+        postView.printPostList(posts, commonContainer.getNowPage(), realMaxPaging);
     }
 
     // command : update
@@ -127,7 +192,7 @@ public class PostController {
             return;
         }
 
-        String userId = commonRepository.getUser().getId();
+        String userId = commonContainer.getUser().getId();
         if (userId.equals(post.getUserId())) {
             System.out.print("제목 : ");
             String title = sc.nextLine();
@@ -136,6 +201,7 @@ public class PostController {
 
             post.setTitle(title);  // new로 새로 만들어도 되지만 수정하는 방법도 있다.
             post.setContents(contents);
+            commonContainer.saveToJson("src/main/java/TextBoard/json/posts.json", postRepository.getPosts());
 
             System.out.printf("%d번 게시물이 수정되었습니다.\n", num);
 
@@ -204,9 +270,10 @@ public class PostController {
             return;
         }
 
-        String userId = commonRepository.getUser().getId();
+        String userId = commonContainer.getUser().getId();
         if (userId.equals(post.getUserId())) {
             postRepository.delete(post);  // index가 아닌 값을 직접 넣어서 해당 값을 삭제할 수도 있다.
+            commonContainer.saveToJson("src/main/java/TextBoard/json/posts.json", postRepository.getPosts());
             System.out.printf("%d번 게시물이 삭제되었습니다.\n", num);
 
             return;
@@ -232,9 +299,10 @@ public class PostController {
         post.increaseView();
         // ======
 
-        String userId = commonRepository.getUser().getId();
-        Like findLikeById = likeRepository.findLikeById(post, userId);
-        postView.printPost(post, findLikeById);  // 서빙한테 넘겨줌
+        String userId = commonContainer.getUser().getId();
+        Like finedLike = likeRepository.findLikeById(post, userId);
+        ArrayList<Comment> comments = commentRepository.getCommentsbyPostNumber(post.getNumber());
+        postView.printPost(post, finedLike, comments);  // 서빙한테 넘겨줌
 
         while(true) {
 
@@ -244,17 +312,20 @@ public class PostController {
                 System.out.print("댓글 내용 : ");
                 String comment = sc.nextLine();
 
-                Comment c = new Comment(comment);
-                post.setComments(c);
+                Comment c = new Comment(comment, getnowDate(), userId, post.getNumber());
+                commentRepository = getCommentRepository();
+                commentRepository.save(c);
+                commonContainer.saveToJson("src/main/java/TextBoard/json/comments.json", commentRepository.getComments());
 
                 System.out.println("댓글이 성공적으로 등록되었습니다");
 
-                //findLikeById = likeRepository.findLikeById(post, userId);
-                postView.printPost(post, findLikeById);
+                //finedLike = likeRepository.findLikeById(post, userId);
+                comments = commentRepository.getCommentsbyPostNumber(post.getNumber());
+                postView.printPost(post, finedLike, comments);
 
             } else if (detailNum == 2) {
 
-                boolean checkLogin = commonRepository.getCheckLogin();
+                boolean checkLogin = commonContainer.getCheckLogin();
 
                 if (!checkLogin) {
                     System.out.println("로그인을 해주세요");
@@ -263,34 +334,43 @@ public class PostController {
 
                 // post 객체 안에 likes가 들어있는 경우
                 // Like like = findLikeById(post);
-                //findLikeById = likeRepository.findLikeById(post, userId);
+                //finedLike = likeRepository.findLikeById(post, userId);
 
-                if (findLikeById == null) {
+                if (finedLike == null) {
 
                     Like l = new Like(post.getNumber(), userId, getnowDate());
                     // post 객체 안에 likes가 들어있는 경우
                     // post.setLike(l);
                     likeRepository.save(l);
+                    commonContainer.saveToJson("src/main/java/TextBoard/json/likes.json", likeRepository.getLikes());
+
                     post.setLikeLength(post.getLikeLength() + 1);
+                    commonContainer.saveToJson("src/main/java/TextBoard/json/posts.json", postRepository.getPosts());
 
                     System.out.println("해당 게시물을 좋아합니다.");
 
-                    postView.printPost(post, l);
+                    comments = commentRepository.getCommentsbyPostNumber(post.getNumber());
+                    postView.printPost(post, l, comments);
 
                     continue;
                 }
 
                 // post 객체 안에 likes가 들어있는 경우
                 // post.getLike().remove(like);
-                likeRepository.delete(findLikeById);
+                likeRepository.delete(finedLike);
+                commonContainer.saveToJson("src/main/java/TextBoard/json/likes.json", likeRepository.getLikes());
+
                 post.setLikeLength(post.getLikeLength() - 1);
+                commonContainer.saveToJson("src/main/java/TextBoard/json/posts.json", postRepository.getPosts());
 
                 System.out.println("해당 게시물의 좋아요를 해제합니다.");
-                postView.printPost(post, null);
+
+                comments = commentRepository.getCommentsbyPostNumber(post.getNumber());
+                postView.printPost(post, null, comments);
 
             } else if (detailNum == 3) {
 
-               // findLikeById = likeRepository.findLikeById(post, userId);
+               // finedLike = likeRepository.findLikeById(post, userId);
                 if (userId.equals(post.getUserId())) {
 
                     System.out.print("제목 : ");
@@ -300,8 +380,10 @@ public class PostController {
 
                     post.setTitle(title);
                     post.setContents(contents);
+                    commonContainer.saveToJson("src/main/java/TextBoard/json/posts.json", postRepository.getPosts());
 
-                    postView.printPost(post, findLikeById);
+                    comments = commentRepository.getCommentsbyPostNumber(post.getNumber());
+                    postView.printPost(post, finedLike, comments);
 
                     continue;
                 }
@@ -310,7 +392,7 @@ public class PostController {
 
             } else if (detailNum == 4) {
 
-                String userName = commonRepository.getUser().getName();
+                String userName = commonContainer.getUser().getName();
 
                 if (userId.equals(post.getUserId())) {
                     System.out.print("정말 게시물을 삭제하시겠습니까? (y/n) : ");
@@ -319,9 +401,10 @@ public class PostController {
                     if (delete.equals("y")) {
                         ArrayList<Post> posts = postRepository.getPosts();
                         postRepository.delete(post);
+                        commonContainer.saveToJson("src/main/java/TextBoard/json/posts.json", postRepository.getPosts());
                         System.out.println(userName + "님의 " + post.getNumber() + "번 게시물을 삭제했습니다.");
 
-                        postView.printPostList(posts, commonRepository.getNowPage(), getMaxPage(posts.size()));
+                        postView.printPostList(posts, commonContainer.getNowPage(), getMaxPage(posts.size()));
                     }
                     break;
                 }
@@ -344,8 +427,8 @@ public class PostController {
         ArrayList<Post> FilterPosts = postRepository.getFilterPosts(keyword);
 
         if (FilterPosts.size() > 0) {
-            commonRepository.setNowPage(1);
-            postView.printPostList(FilterPosts, commonRepository.getNowPage(), getMaxPage(FilterPosts.size()));
+            commonContainer.setNowPage(1);
+            postView.printPostList(FilterPosts, commonContainer.getNowPage(), getMaxPage(FilterPosts.size()));
             return;
         }
 
@@ -362,29 +445,29 @@ public class PostController {
             int way = checkNum("정렬 방법을 선택해주세요. (1. 오름차순, 2. 내림차순) : ");
 
             ArrayList<Post> posts = postRepository.getPosts();
-            commonRepository.setNowPage(1);
+            commonContainer.setNowPage(1);
 
             if (object == 1) {
                 if (way == 1) {
                     Collections.sort(posts, new PostComparatorByNumber());
-                    postView.printPostList(posts, commonRepository.getNowPage(), getMaxPage(posts.size()));
+                    postView.printPostList(posts, commonContainer.getNowPage(), getMaxPage(posts.size()));
                     break;
 
                 } else if (way == 2) {
                     Collections.sort(posts, new PostComparatorByNumber().reversed());
-                    postView.printPostList(posts, commonRepository.getNowPage(), getMaxPage(posts.size()));
+                    postView.printPostList(posts, commonContainer.getNowPage(), getMaxPage(posts.size()));
                     break;
                 }
 
             } else if (object == 2) {
                 if (way == 1) {
                     Collections.sort(posts, new PostComparatorByView());
-                    postView.printPostList(posts, commonRepository.getNowPage(), getMaxPage(posts.size()));
+                    postView.printPostList(posts, commonContainer.getNowPage(), getMaxPage(posts.size()));
                     break;
 
                 } else if (way == 2) {
                     Collections.sort(posts, new PostComparatorByView().reversed());
-                    postView.printPostList(posts, commonRepository.getNowPage(), getMaxPage(posts.size()));
+                    postView.printPostList(posts, commonContainer.getNowPage(), getMaxPage(posts.size()));
                     break;
                 }
             }
@@ -399,22 +482,22 @@ public class PostController {
             int pageCom = checkNum("페이징 명령어를 입력해주세요 (1. 이전, 2. 다음, 3. 선택, 4. 뒤로가기) : ");
 
             if (pageCom == 1) {
-                if (commonRepository.getNowPage() == 1) {
+                if (commonContainer.getNowPage() == 1) {
                     System.out.println("이전 페이지가 없습니다.");
                     continue;
                 }
-                commonRepository.setNowPage(commonRepository.getNowPage() - 1);
+                commonContainer.setNowPage(commonContainer.getNowPage() - 1);
                 list();
 
             } else if (pageCom == 2) {
                 int postSize = postRepository.getPosts().size();
 
-                if (commonRepository.getNowPage() == getMaxPage(postSize)) {
+                if (commonContainer.getNowPage() == getMaxPage(postSize)) {
                     System.out.println("다음 페이지가 없습니다.");
                     continue;
                 }
 
-                commonRepository.setNowPage(commonRepository.getNowPage() + 1);
+                commonContainer.setNowPage(commonContainer.getNowPage() + 1);
                 list();
             } else if (pageCom == 3) {
                 int movePage = checkNum("이동하실 페이지 번호를 입력해주세요 : ");
@@ -424,7 +507,7 @@ public class PostController {
                     System.out.println("선택한 페이지가 없습니다.");
                     continue;
                 }
-                commonRepository.setNowPage(movePage);
+                commonContainer.setNowPage(movePage);
                 list();
 
             } else if (pageCom == 4) {
@@ -457,7 +540,7 @@ public class PostController {
         return maxPage;
     }
 
-    public static PostRepository getPostRepository() {
+    public PostRepository getPostRepository() {
         return postRepository;
     }
 
@@ -472,5 +555,17 @@ public class PostController {
                 System.out.println("숫자를 입력해주세요.");
             }
         }
+    }
+
+    public void setComments(Comment comment) {
+        commentRepository.save(comment);
+    }
+
+    public CommentRepository getCommentRepository() {
+        return commentRepository;
+    }
+
+    public void setCommentRepository(CommentRepository commentRepository) {
+        this.commentRepository = commentRepository;
     }
 }

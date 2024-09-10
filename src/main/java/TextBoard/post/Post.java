@@ -1,7 +1,6 @@
 package TextBoard.post;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class Post implements Serializable {
     private int number;
@@ -13,7 +12,8 @@ public class Post implements Serializable {
     private String userId;
     private int likeLength;
 
-    private ArrayList<Comment> comments = new ArrayList<>();
+    // jackson 에서 Json 파일을 불러오기 위해 필요한 기본 생성자
+    public Post () {}
 
     public Post (int number, String title, String contents, String date, int view, String userId, String writer, int likelength) {
         setNumber(number);
@@ -46,10 +46,6 @@ public class Post implements Serializable {
         this.view = view;
     }
 
-    public void setComments(Comment comment) {
-        comments.add(comment);
-    }
-
     public void setWriter(String writer) {
         this.writer = writer;
     }
@@ -79,9 +75,6 @@ public class Post implements Serializable {
         return view;
     }
 
-    public ArrayList<Comment> getComments() {
-        return comments;
-    }
 
     public String getWriter() {
         return writer;

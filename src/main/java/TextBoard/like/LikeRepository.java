@@ -21,32 +21,10 @@ public class LikeRepository {
 
     public void save(Like like) {
         likes.add(like);
-
-        // ArrayList를 파일로 저장
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("likes.txt"));
-            oos.writeObject(getLikes());  // 파일에 ArrayList 저장
-            oos.close();
-            System.out.println("like 정보가 파일에 저장되었습니다.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Like save fail");
-        }
     }
 
     public void delete(Like like) {
         likes.remove(like);
-
-        // ArrayList를 파일로 저장
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("likes.txt"));
-            oos.writeObject(getLikes());  // 파일에 ArrayList 저장
-            oos.close();
-            System.out.println("like 정보가 파일에 저장되었습니다.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Like save fail");
-        }
     }
 
     public void setLikes(ArrayList<Like> likes) {

@@ -8,16 +8,16 @@ import java.util.Scanner;
 
 public class BoardApp {
 
-    private static CommonRepository commonRepository = new CommonRepository();
+    private static CommonContainer commonContainer = new CommonContainer();
     private static MemberController memberController = new MemberController();
     private static PostController postController = new PostController();
-    private static LikeController likeController = new LikeController();
+    private LikeController likeController = new LikeController();
 
     private Scanner sc = new Scanner(System.in);
 
     public void run() {
         while(true) {
-            System.out.print("명령어를 입력해주세요" + commonRepository.getMemberInfo() + " : ");
+            System.out.print("명령어를 입력해주세요" + commonContainer.getMemberInfo() + " : ");
             String command = sc.nextLine();
 
             if (command.equals("exit")) {
@@ -61,8 +61,8 @@ public class BoardApp {
         }
     }
 
-    public static CommonRepository getCommonRepository() {
-        return commonRepository;
+    public static CommonContainer getCommonRepository() {
+        return commonContainer;
     }
 
     public static PostController getPostController() {
