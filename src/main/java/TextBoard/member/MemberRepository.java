@@ -7,19 +7,6 @@ public class MemberRepository {
 
     private ArrayList<Member> members = new ArrayList<>();
 
-    public MemberRepository () {
-        // 파일에서 ArrayList를 읽어오기
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("members.txt"));
-            setMembers((ArrayList<Member>)ois.readObject());  // 파일에서 ArrayList읽기
-            ois.close();
-            System.out.println("Member 정보가 파일에서 읽어졌습니다.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Member upload fail");
-        }
-    }
-
     public void save (Member member) {
         members.add(member);
 

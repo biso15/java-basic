@@ -7,19 +7,6 @@ import java.util.ArrayList;
 public class PostRepository {
     private ArrayList<Post> posts = new ArrayList<>();
 
-    public PostRepository () {
-        // 파일에서 ArrayList를 읽어오기
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("posts.txt"));
-            setPosts((ArrayList<Post>)ois.readObject());  // 파일에서 ArrayList읽기
-            ois.close();
-            System.out.println("Post 정보가 파일에서 읽어졌습니다.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Post upload fail");
-        }
-    }
-
     // 누군가에게 Post를 넘겨받아서 창고(ArrayList)에 저장해주는 기능
     public void save(Post post) {
         posts.add(post);
@@ -27,11 +14,10 @@ public class PostRepository {
         // ArrayList를 파일로 저장
         try {
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("posts.txt"));
-            oos.writeObject(getPosts());  // 파일에 ArrayList 저장
+            oos.writeObject(getPosts());//파일에 ArrayList 저장
             oos.close();
             System.out.println("Post 정보가 파일에 저장되었습니다.");
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println("Post save fail");
         }
     }

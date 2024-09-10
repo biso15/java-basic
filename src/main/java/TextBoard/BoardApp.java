@@ -1,5 +1,6 @@
 package TextBoard;
 
+import TextBoard.like.LikeController;
 import TextBoard.post.PostController;
 import TextBoard.member.MemberController;
 
@@ -10,10 +11,11 @@ public class BoardApp {
     private static CommonRepository commonRepository = new CommonRepository();
     private static MemberController memberController = new MemberController();
     private static PostController postController = new PostController();
+    private static LikeController likeController = new LikeController();
 
     private Scanner sc = new Scanner(System.in);
 
-    public void run() throws NumberFormatException {
+    public void run() {
         while(true) {
             System.out.print("명령어를 입력해주세요" + commonRepository.getMemberInfo() + " : ");
             String command = sc.nextLine();

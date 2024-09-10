@@ -7,6 +7,9 @@ import TextBoard.like.LikeRepository;
 import TextBoard.member.Member;
 import TextBoard.like.Like;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.ObjectInputStream;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,14 +33,27 @@ public class PostController {
     // 값의 초기화는 대부분 생성자에서 해주는 것을 권장합니다. 다양한 로직 수행 가능합니다.
     public PostController () {
 
-        for (int i = 0; i < 100; i++) {
-            int iValue = (int)(Math.random() * 100);
-            int iValue2 = (int)(Math.random() * 100);
-            Post p1 = new Post(i + 1, "안녕하세요 반갑습니다. java 공부중이에요." + i,"java 너무 재밌어요!!" + i, getnowDate(), iValue, "kd", "kildong", iValue2);
+        // 파일에서 ArrayList를 읽어오기
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("posts.txt"));
+            postRepository.setPosts((ArrayList<Post>)ois.readObject());  // 파일에서 ArrayList읽기
+            ois.close();
+            System.out.println("Post 정보를 파일에서 읽었습니다.");
+        } catch (FileNotFoundException e) {
+            for (int i = 0; i < 100; i++) {
+                int iValue = (int)(Math.random() * 100);
+                int iValue2 = (int)(Math.random() * 100);
+                Post p1 = new Post(i + 1, "안녕하세요 반갑습니다. java 공부중이에요." + i,"java 너무 재밌어요!!" + i, getnowDate(), iValue, "kd", "kildong", iValue2);
 
-            postRepository.save(p1);
+                postRepository.save(p1);
+            }
             lastPost = 100;
+            System.out.println("Post 임시 데이터 읽었습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Post load fail");
         }
+
     }
 
     // command : add
@@ -91,43 +107,42 @@ public class PostController {
     // command : update
     public void update(){
 
-        while(true) {
-            System.out.print("수정할 게시물 번호 : ");
+        int num = checkNum("수정할 게시물 번호 : ");
 
-            try {
+//            int num;
+//            try {
+//                System.out.print("수정할 게시물 번호 : ");
+//                num = Integer.parseInt(sc.nextLine());
+//
+//            } catch (NumberFormatException e) {
+//                System.out.println("숫자를 입력해주세요.");
+//                continue;
+//            }
 
-                int num = Integer.parseInt(sc.nextLine());
+        Post post = postRepository.findPostByNumber(num);
 
-                Post post = postRepository.findPostByNumber(num);
+        boolean checkPost = checkPost(post);
 
-                boolean checkPost = checkPost(post);
-
-                if (!checkPost) {
-                    return;
-                }
-
-                String userId = commonRepository.getUser().getId();
-                if (userId.equals(post.getUserId())) {
-                    System.out.print("제목 : ");
-                    String title = sc.nextLine();
-                    System.out.print("내용 : ");
-                    String contents = sc.nextLine();
-
-                    post.setTitle(title);  // new로 새로 만들어도 되지만 수정하는 방법도 있다.
-                    post.setContents(contents);
-
-                    System.out.printf("%d번 게시물이 수정되었습니다.\n", num);
-
-                    return;
-                }
-
-                System.out.println("자신의 게시물만 수정/삭제 할 수 있습니다.");
-                break;
-
-            } catch (NumberFormatException e) {
-                System.out.println("숫자를 입력해주세요.");
-            }
+        if (!checkPost) {
+            return;
         }
+
+        String userId = commonRepository.getUser().getId();
+        if (userId.equals(post.getUserId())) {
+            System.out.print("제목 : ");
+            String title = sc.nextLine();
+            System.out.print("내용 : ");
+            String contents = sc.nextLine();
+
+            post.setTitle(title);  // new로 새로 만들어도 되지만 수정하는 방법도 있다.
+            post.setContents(contents);
+
+            System.out.printf("%d번 게시물이 수정되었습니다.\n", num);
+
+            return;
+        }
+
+        System.out.println("자신의 게시물만 수정/삭제 할 수 있습니다.");
 
 //        메서드로 해당 객체를 리턴 받아서 작업
 //        Post post = findPostByNumber(num);
@@ -179,174 +194,145 @@ public class PostController {
 
     // command : delete
     public void delete() {
-        while(true) {
-            System.out.print("삭제할 게시물 번호 : ");
+        int num = checkNum("삭제할 게시물 번호 : ");
 
-            try {
+        Post post = postRepository.findPostByNumber(num);
 
-                int num = Integer.parseInt(sc.nextLine());
+        boolean checkPost = checkPost(post);
 
-                Post post = postRepository.findPostByNumber(num);
-
-                boolean checkPost = checkPost(post);
-
-                if (!checkPost) {
-                    return;
-                }
-
-                String userId = commonRepository.getUser().getId();
-                if (userId.equals(post.getUserId())) {
-                    postRepository.delete(post);  // index가 아닌 값을 직접 넣어서 해당 값을 삭제할 수도 있다.
-                    System.out.printf("%d번 게시물이 삭제되었습니다.\n", num);
-
-                    return;
-                }
-
-                System.out.println("자신의 게시물만 수정/삭제 할 수 있습니다.");
-
-                break;
-
-            } catch (NumberFormatException e) {
-                System.out.println("숫자를 입력해주세요.");
-            }
-
+        if (!checkPost) {
+            return;
         }
+
+        String userId = commonRepository.getUser().getId();
+        if (userId.equals(post.getUserId())) {
+            postRepository.delete(post);  // index가 아닌 값을 직접 넣어서 해당 값을 삭제할 수도 있다.
+            System.out.printf("%d번 게시물이 삭제되었습니다.\n", num);
+
+            return;
+        }
+
+        System.out.println("자신의 게시물만 수정/삭제 할 수 있습니다.");
     }
 
     // command : detail
     public void detail() {
+        int num = checkNum("상세보기 할 게시물 번호를 입력해주세요 : ");
 
-        while(true) {
-            System.out.print("상세보기 할 게시물 번호를 입력해주세요 : ");
+        Post post = postRepository.findPostByNumber(num);  // 창고에서 꺼내서
 
-            try {
-                int num = Integer.parseInt(sc.nextLine());
+        boolean checkPost = checkPost(post);
 
-                Post post = postRepository.findPostByNumber(num);  // 창고에서 꺼내서
-
-                boolean checkPost = checkPost(post);
-
-                // ==== 요리를 한다음
-                if (!checkPost) {
-                    return;
-                }
+        // ==== 요리를 한다음
+        if (!checkPost) {
+            return;
+        }
 
 //        post.setView(post.getView() + 1);
-                post.increaseView();
-                // ======
+        post.increaseView();
+        // ======
 
-                String userId = commonRepository.getUser().getId();
-                Like findLikeById = likeRepository.findLikeById(post, userId);
-                postView.printPost(post, findLikeById);  // 서빙한테 넘겨줌
+        String userId = commonRepository.getUser().getId();
+        Like findLikeById = likeRepository.findLikeById(post, userId);
+        postView.printPost(post, findLikeById);  // 서빙한테 넘겨줌
 
-                while(true) {
-                    System.out.print("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 좋아요, 3. 수정, 4. 삭제, 5. 목록으로) : ");
-                    try {
-                        int detailNum = Integer.parseInt(sc.nextLine());
+        while(true) {
 
-                        if (detailNum == 1) {
-                            System.out.print("댓글 내용 : ");
-                            String comment = sc.nextLine();
+            int detailNum = checkNum("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 좋아요, 3. 수정, 4. 삭제, 5. 목록으로) : ");
 
-                            Comment c = new Comment(comment);
-                            post.setComments(c);
+            if (detailNum == 1) {
+                System.out.print("댓글 내용 : ");
+                String comment = sc.nextLine();
 
-                            System.out.println("댓글이 성공적으로 등록되었습니다");
+                Comment c = new Comment(comment);
+                post.setComments(c);
 
-                            findLikeById = likeRepository.findLikeById(post, userId);
-                            postView.printPost(post, findLikeById);
+                System.out.println("댓글이 성공적으로 등록되었습니다");
 
-                        } else if (detailNum == 2) {
+                //findLikeById = likeRepository.findLikeById(post, userId);
+                postView.printPost(post, findLikeById);
 
-                            boolean checkLogin = commonRepository.getCheckLogin();
+            } else if (detailNum == 2) {
 
-                            if (!checkLogin) {
-                                System.out.println("로그인을 해주세요");
-                                continue;
-                            }
+                boolean checkLogin = commonRepository.getCheckLogin();
 
-                            // post 객체 안에 likes가 들어있는 경우
-                            // Like like = findLikeById(post);
-                            findLikeById = likeRepository.findLikeById(post, userId);
-
-                            if (findLikeById == null) {
-
-                                Like l = new Like(post.getNumber(), userId, getnowDate());
-                                // post 객체 안에 likes가 들어있는 경우
-                                // post.setLike(l);
-                                likeRepository.save(l);
-                                post.setLikeLength(post.getLikeLength() + 1);
-
-                                System.out.println("해당 게시물을 좋아합니다.");
-
-                                postView.printPost(post, l);
-
-                                continue;
-                            }
-
-                            // post 객체 안에 likes가 들어있는 경우
-                            // post.getLike().remove(like);
-                            likeRepository.delete(findLikeById);
-                            post.setLikeLength(post.getLikeLength() - 1);
-
-                            System.out.println("해당 게시물의 좋아요를 해제합니다.");
-                            postView.printPost(post, null);
-
-                        } else if (detailNum == 3) {
-
-                            findLikeById = likeRepository.findLikeById(post, userId);
-                            if (userId.equals(post.getUserId())) {
-
-                                System.out.print("제목 : ");
-                                String title = sc.nextLine();
-                                System.out.print("내용 : ");
-                                String contents = sc.nextLine();
-
-                                post.setTitle(title);
-                                post.setContents(contents);
-
-                                postView.printPost(post, findLikeById);
-
-                                continue;
-                            }
-
-                            System.out.println("자신의 게시물만 수정/삭제 할 수 있습니다.");
-
-                        } else if (detailNum == 4) {
-
-                            String userName = commonRepository.getUser().getName();
-
-                            if (userId.equals(post.getUserId())) {
-                                System.out.print("정말 게시물을 삭제하시겠습니까? (y/n) : ");
-                                String delete = sc.nextLine();
-
-                                if (delete.equals("y")) {
-                                    ArrayList<Post> posts = postRepository.getPosts();
-                                    postRepository.delete(post);
-                                    System.out.println(userName + "님의 " + post.getNumber() + "번 게시물을 삭제했습니다.");
-
-                                    postView.printPostList(posts, commonRepository.getNowPage(), getMaxPage(posts.size()));
-                                }
-                                break;
-                            }
-
-                            System.out.println("자신의 게시물만 수정/삭제 할 수 있습니다.");
-
-                        } else if (detailNum == 5) {
-                            System.out.println("상세보기 화면을 빠져나갑니다.");
-                            break;
-                        }
-                        break;
-
-                    } catch (NumberFormatException e) {
-                        System.out.println("숫자를 입력해주세요.");
-                    }
+                if (!checkLogin) {
+                    System.out.println("로그인을 해주세요");
+                    continue;
                 }
-                break;
 
-            } catch (NumberFormatException e2){
-                System.out.println("숫자를 입력해주세요.");
+                // post 객체 안에 likes가 들어있는 경우
+                // Like like = findLikeById(post);
+                //findLikeById = likeRepository.findLikeById(post, userId);
+
+                if (findLikeById == null) {
+
+                    Like l = new Like(post.getNumber(), userId, getnowDate());
+                    // post 객체 안에 likes가 들어있는 경우
+                    // post.setLike(l);
+                    likeRepository.save(l);
+                    post.setLikeLength(post.getLikeLength() + 1);
+
+                    System.out.println("해당 게시물을 좋아합니다.");
+
+                    postView.printPost(post, l);
+
+                    continue;
+                }
+
+                // post 객체 안에 likes가 들어있는 경우
+                // post.getLike().remove(like);
+                likeRepository.delete(findLikeById);
+                post.setLikeLength(post.getLikeLength() - 1);
+
+                System.out.println("해당 게시물의 좋아요를 해제합니다.");
+                postView.printPost(post, null);
+
+            } else if (detailNum == 3) {
+
+               // findLikeById = likeRepository.findLikeById(post, userId);
+                if (userId.equals(post.getUserId())) {
+
+                    System.out.print("제목 : ");
+                    String title = sc.nextLine();
+                    System.out.print("내용 : ");
+                    String contents = sc.nextLine();
+
+                    post.setTitle(title);
+                    post.setContents(contents);
+
+                    postView.printPost(post, findLikeById);
+
+                    continue;
+                }
+
+                System.out.println("자신의 게시물만 수정/삭제 할 수 있습니다.");
+
+            } else if (detailNum == 4) {
+
+                String userName = commonRepository.getUser().getName();
+
+                if (userId.equals(post.getUserId())) {
+                    System.out.print("정말 게시물을 삭제하시겠습니까? (y/n) : ");
+                    String delete = sc.nextLine();
+
+                    if (delete.equals("y")) {
+                        ArrayList<Post> posts = postRepository.getPosts();
+                        postRepository.delete(post);
+                        System.out.println(userName + "님의 " + post.getNumber() + "번 게시물을 삭제했습니다.");
+
+                        postView.printPostList(posts, commonRepository.getNowPage(), getMaxPage(posts.size()));
+                    }
+                    break;
+                }
+
+                System.out.println("자신의 게시물만 수정/삭제 할 수 있습니다.");
+
+            } else if (detailNum == 5) {
+                System.out.println("상세보기 화면을 빠져나갑니다.");
+                break;
             }
+
         }
     }
 
@@ -370,51 +356,38 @@ public class PostController {
 
     // command : sort
     public void sort() {
+        int object = checkNum("정렬 대상을 선택해주세요. (1. 번호, 2. 조회수) : ");
+
         while(true) {
-            System.out.print("정렬 대상을 선택해주세요. (1. 번호, 2. 조회수) : ");
-            try {
-                int object = Integer.parseInt(sc.nextLine());
+            int way = checkNum("정렬 방법을 선택해주세요. (1. 오름차순, 2. 내림차순) : ");
 
-                while(true) {
-                    System.out.print("정렬 방법을 선택해주세요. (1. 오름차순, 2. 내림차순) : ");
-                    try {
+            ArrayList<Post> posts = postRepository.getPosts();
+            commonRepository.setNowPage(1);
 
-                        int way = Integer.parseInt(sc.nextLine());
+            if (object == 1) {
+                if (way == 1) {
+                    Collections.sort(posts, new PostComparatorByNumber());
+                    postView.printPostList(posts, commonRepository.getNowPage(), getMaxPage(posts.size()));
+                    break;
 
-                        ArrayList<Post> posts = postRepository.getPosts();
-                        commonRepository.setNowPage(1);
-
-                        if (object == 1) {
-                            if (way == 1) {
-                                Collections.sort(posts, new PostComparatorByNumber());
-                                postView.printPostList(posts, commonRepository.getNowPage(), getMaxPage(posts.size()));
-
-                            } else if (way == 2) {
-                                Collections.sort(posts, new PostComparatorByNumber().reversed());
-                                postView.printPostList(posts, commonRepository.getNowPage(), getMaxPage(posts.size()));
-                            }
-
-                        } else if (object == 2) {
-                            if (way == 1) {
-                                Collections.sort(posts, new PostComparatorByView());
-                                postView.printPostList(posts, commonRepository.getNowPage(), getMaxPage(posts.size()));
-
-                            } else if (way == 2) {
-                                Collections.sort(posts, new PostComparatorByView().reversed());
-                                postView.printPostList(posts, commonRepository.getNowPage(), getMaxPage(posts.size()));
-                            }
-                        }
-                        break;
-
-                    } catch (NumberFormatException e) {
-                        System.out.println("숫자를 입력해주세요.");
-                    }
+                } else if (way == 2) {
+                    Collections.sort(posts, new PostComparatorByNumber().reversed());
+                    postView.printPostList(posts, commonRepository.getNowPage(), getMaxPage(posts.size()));
+                    break;
                 }
-                break;
-            } catch (NumberFormatException e) {
-                System.out.println("숫자를 입력해주세요.");
-            }
 
+            } else if (object == 2) {
+                if (way == 1) {
+                    Collections.sort(posts, new PostComparatorByView());
+                    postView.printPostList(posts, commonRepository.getNowPage(), getMaxPage(posts.size()));
+                    break;
+
+                } else if (way == 2) {
+                    Collections.sort(posts, new PostComparatorByView().reversed());
+                    postView.printPostList(posts, commonRepository.getNowPage(), getMaxPage(posts.size()));
+                    break;
+                }
+            }
         }
     }
 
@@ -423,52 +396,39 @@ public class PostController {
         list();
 
         while(true) {
-            System.out.print("페이징 명령어를 입력해주세요 (1. 이전, 2. 다음, 3. 선택, 4. 뒤로가기) : ");
-            try {
-                int pageCom = Integer.parseInt(sc.nextLine());
+            int pageCom = checkNum("페이징 명령어를 입력해주세요 (1. 이전, 2. 다음, 3. 선택, 4. 뒤로가기) : ");
 
-                if (pageCom == 1) {
-                    if (commonRepository.getNowPage() == 1) {
-                        System.out.println("이전 페이지가 없습니다.");
-                        continue;
-                    }
-                    commonRepository.setNowPage(commonRepository.getNowPage() - 1);
-                    list();
-
-                } else if (pageCom == 2) {
-                    int postSize = postRepository.getPosts().size();
-
-                    if (commonRepository.getNowPage() == getMaxPage(postSize)) {
-                        System.out.println("다음 페이지가 없습니다.");
-                        continue;
-                    }
-
-                    commonRepository.setNowPage(commonRepository.getNowPage() + 1);
-                    list();
-                } else if (pageCom == 3) {
-                    System.out.print("이동하실 페이지 번호를 입력해주세요 : ");
-                    try {
-                        int movePage = Integer.parseInt(sc.nextLine());
-                        int postSize = postRepository.getPosts().size();
-
-                        if (movePage > getMaxPage(postSize)) {
-                            System.out.println("선택한 페이지가 없습니다.");
-                            continue;
-                        }
-
-                        commonRepository.setNowPage(movePage);
-                        list();
-                        break;
-                    } catch (NumberFormatException e){
-                        System.out.println("숫자를 입력해주세요.");
-                    }
-
-                } else if (pageCom == 4) {
-                    break;
+            if (pageCom == 1) {
+                if (commonRepository.getNowPage() == 1) {
+                    System.out.println("이전 페이지가 없습니다.");
+                    continue;
                 }
+                commonRepository.setNowPage(commonRepository.getNowPage() - 1);
+                list();
+
+            } else if (pageCom == 2) {
+                int postSize = postRepository.getPosts().size();
+
+                if (commonRepository.getNowPage() == getMaxPage(postSize)) {
+                    System.out.println("다음 페이지가 없습니다.");
+                    continue;
+                }
+
+                commonRepository.setNowPage(commonRepository.getNowPage() + 1);
+                list();
+            } else if (pageCom == 3) {
+                int movePage = checkNum("이동하실 페이지 번호를 입력해주세요 : ");
+                int postSize = postRepository.getPosts().size();
+
+                if (movePage > getMaxPage(postSize)) {
+                    System.out.println("선택한 페이지가 없습니다.");
+                    continue;
+                }
+                commonRepository.setNowPage(movePage);
+                list();
+
+            } else if (pageCom == 4) {
                 break;
-            } catch (NumberFormatException e) {
-                System.out.println("숫자를 입력해주세요.");
             }
         }
     }
@@ -499,5 +459,18 @@ public class PostController {
 
     public static PostRepository getPostRepository() {
         return postRepository;
+    }
+
+    public int checkNum (String request) {
+        int num;
+        while(true) {
+            try {
+                System.out.print(request);
+                num = Integer.parseInt(sc.nextLine());
+                return num;
+            } catch (NumberFormatException e) {
+                System.out.println("숫자를 입력해주세요.");
+            }
+        }
     }
 }

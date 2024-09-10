@@ -3,6 +3,10 @@ package TextBoard.member;
 import TextBoard.BoardApp;
 import TextBoard.CommonRepository;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MemberController {
@@ -15,11 +19,26 @@ public class MemberController {
 
     public MemberController() {
 
-        Member m1 = new Member("kd", "kd", "kildong");
-        Member m2 = new Member("ks", "ks", "kilsoon");
+        // 파일에서 ArrayList를 읽어오기
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("members.txt"));
+            memberRepository.setMembers((ArrayList<Member>)ois.readObject());  // 파일에서 ArrayList읽기
+            ois.close();
+            System.out.println("Member 정보를 파일에서 읽었습니다.");
+        } catch (FileNotFoundException e) {
+            Member m1 = new Member("kd", "kd", "kildong");
+            Member m2 = new Member("ks", "ks", "kilsoon");
 
-        memberRepository.save(m1);
-        memberRepository.save(m2);
+            memberRepository.save(m1);
+            memberRepository.save(m2);
+
+            System.out.println("Member 임시 데이터 읽었습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Member load fail");
+        }
+
+
     }
 
     // command : signup

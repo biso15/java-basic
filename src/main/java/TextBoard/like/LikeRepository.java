@@ -9,20 +9,6 @@ public class LikeRepository {
 
     private ArrayList<Like> likes = new ArrayList<>();
 
-    public LikeRepository () {
-
-        // 파일에서 ArrayList를 읽어오기
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("likes.txt"));
-            setLikes((ArrayList<Like>)ois.readObject());  // 파일에서 ArrayList읽기
-            ois.close();
-            System.out.println("Like 정보를 파일에서 읽어졌습니다.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Like upload fail");
-        }
-    }
-
 //    post 객체 안에 likes가 들어있는 경우
 //    public Like findLikeById(Post post) {
 //        for (Like like : post.getLike()) {
