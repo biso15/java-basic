@@ -11,7 +11,7 @@ public class BoardApp {
     private static CommonContainer commonContainer = new CommonContainer();
     private static MemberController memberController = new MemberController();
     private static PostController postController = new PostController();
-    private LikeController likeController = new LikeController();
+    private static LikeController likeController = new LikeController();
 
     private Scanner sc = new Scanner(System.in);
 
@@ -67,5 +67,33 @@ public class BoardApp {
 
     public static PostController getPostController() {
         return postController;
+    }
+
+    public static CommonContainer getCommonContainer() {
+        return commonContainer;
+    }
+
+    public static void setCommonContainer(CommonContainer _commonContainer) {
+        commonContainer = _commonContainer;
+    }
+
+    public static MemberController getMemberController() {
+        return memberController;
+    }
+
+    public static void setMemberController(MemberController _memberController) {
+        memberController = _memberController;
+    }
+
+    public static void setPostController(PostController _postController) {
+        postController = _postController;
+    }
+
+    public LikeController getLikeController() {
+        return likeController;
+    }
+
+    public void setLikeController(LikeController _likeController) {
+        likeController = _likeController;
     }
 }

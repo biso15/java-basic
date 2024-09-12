@@ -1,4 +1,4 @@
-package TextBoardAnswer;
+package TextBoardAnswer.test;
 
 public class ContainsTest {
     public static void main(String[] args) {

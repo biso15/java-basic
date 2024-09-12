@@ -2,14 +2,11 @@ package TextBoard.post;
 
 import TextBoard.BoardApp;
 import TextBoard.CommonContainer;
+import TextBoard.like.Like;
 import TextBoard.like.LikeController;
 import TextBoard.like.LikeRepository;
 import TextBoard.member.Member;
-import TextBoard.like.Like;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.*;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,69 +30,70 @@ public class PostController {
     private int lastPost = 0;  // 가장 최신의 number값. number값의 고유성을 유지하기 위해 1씩 증가시킬 계획임.
 
     // 값의 초기화는 대부분 생성자에서 해주는 것을 권장합니다. 다양한 로직 수행 가능합니다.
-    public PostController () {
+    public PostController() {
 
-        // Json 파일에서 ArrayList를 읽어오기
-        // Jackson ObjectMapper 생성
-        ObjectMapper mapper = new ObjectMapper();
-
-        try {
-            // JSON 파일을 ArrayList로 변환
-            ArrayList<Post> posts = mapper.readValue(new File("src/main/java/TextBoard/json/posts.json"), new TypeReference<ArrayList<Post>>() {});
-
-            // 레포지토리에 저장
-            for (Post post : posts) {
-                postRepository.save(post);
-            }
-
-            System.out.println("post JSON 파일을 ArrayList로 읽어왔습니다.");
-
-        } catch (FileNotFoundException e) {
-            for (int i = 0; i < 100; i++) {
-                int iValue = (int)(Math.random() * 100);
-                int iValue2 = (int)(Math.random() * 100);
-                Post p = new Post(i + 1, "안녕하세요 반갑습니다. java 공부중이에요." + i,"java 너무 재밌어요!!" + i, getnowDate(), iValue, "kd", "kildong", iValue2);
-
-                postRepository.save(p);
-            }
-            lastPost = 100;
-
-            commonContainer.saveToJson("src/main/java/TextBoard/json/posts.json", postRepository.getPosts());
-
-            System.out.println("Post 임시 데이터를 만들었습니다.");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        try {
-            // JSON 파일을 ArrayList로 변환
-            ArrayList<Comment> comments = mapper.readValue(new File("src/main/java/TextBoard/json/comments.json"), new TypeReference<ArrayList<Comment>>() {});
-
-            // 레포지토리에 저장
-            for (Comment comment : comments) {
-                commentRepository.save(comment);
-            }
-
-            System.out.println("comment JSON 파일을 ArrayList로 읽어왔습니다.");
-
-        } catch (FileNotFoundException e) {
-
-            for (int i = 0; i < 10; i++) {
-                int iValue = (int)(Math.random() * 3);
-                Comment c = new Comment("안녕하세요 반갑습니다. 댓글이예요" + i, getnowDate(), "kd", iValue);
-
-                commentRepository.save(c);
-            }
-
-            commonContainer.saveToJson("src/main/java/TextBoard/json/comments.json", commentRepository.getComments());
-
-            System.out.println("Comment 임시 데이터를 만들었습니다.");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        // Json 파일에서 ArrayList를 읽어오기
+//        // Jackson ObjectMapper 생성
+//        ObjectMapper mapper = new ObjectMapper();
+//
+//        try {
+//            // JSON 파일을 ArrayList로 변환
+//            ArrayList<Post> posts = mapper.readValue(new File("src/main/java/TextBoard/json/posts.json"), new TypeReference<ArrayList<Post>>() {
+//            });
+//
+//            // 레포지토리에 저장
+//            for (Post post : posts) {
+//                postRepository.save(post);
+//            }
+//
+//            System.out.println("post JSON 파일을 ArrayList로 읽어왔습니다.");
+//
+//        } catch (FileNotFoundException e) {
+//            for (int i = 0; i < 100; i++) {
+//                int iValue = (int) (Math.random() * 100);
+//                int iValue2 = (int) (Math.random() * 100);
+//                Post p = new Post(i + 1, "안녕하세요 반갑습니다. java 공부중이에요." + i, "java 너무 재밌어요!!" + i, getnowDate(), iValue, "kd", "kildong", iValue2);
+//
+//                postRepository.save(p);
+//            }
+//            lastPost = 100;
+//
+//            commonContainer.saveToJson("src/main/java/TextBoard/json/posts.json", postRepository.getPosts());
+//
+//            System.out.println("Post 임시 데이터를 만들었습니다.");
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        try {
+//            // JSON 파일을 ArrayList로 변환
+//            ArrayList<Comment> comments = mapper.readValue(new File("src/main/java/TextBoard/json/comments.json"), new TypeReference<ArrayList<Comment>>() {
+//            });
+//
+//            // 레포지토리에 저장
+//            for (Comment comment : comments) {
+//                commentRepository.save(comment);
+//            }
+//
+//            System.out.println("comment JSON 파일을 ArrayList로 읽어왔습니다.");
+//
+//        } catch (FileNotFoundException e) {
+//
+//            for (int i = 0; i < 10; i++) {
+//                int iValue = (int) (Math.random() * 3) + 1;
+//                Comment c = new Comment("안녕하세요 반갑습니다. 댓글이예요" + i, getnowDate(), "kd", iValue);
+//
+//                commentRepository.save(c);
+//            }
+//
+//            commonContainer.saveToJson("src/main/java/TextBoard/json/comments.json", commentRepository.getComments());
+//
+//            System.out.println("Comment 임시 데이터를 만들었습니다.");
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
 
 //        // txt 파일에서 ArrayList를 읽어오기
@@ -170,9 +168,9 @@ public class PostController {
     }
 
     // command : update
-    public void update(){
-
-        int num = checkNum("수정할 게시물 번호 : ");
+    public void update() {
+        System.out.print("수정할 게시물 번호 : ");
+        int num = checkNum(sc.nextLine());
 
 //            int num;
 //            try {
@@ -260,7 +258,8 @@ public class PostController {
 
     // command : delete
     public void delete() {
-        int num = checkNum("삭제할 게시물 번호 : ");
+        System.out.print("삭제할 게시물 번호 : ");
+        int num = checkNum(sc.nextLine());
 
         Post post = postRepository.findPostByNumber(num);
 
@@ -284,7 +283,8 @@ public class PostController {
 
     // command : detail
     public void detail() {
-        int num = checkNum("상세보기 할 게시물 번호를 입력해주세요 : ");
+        System.out.print("상세보기 할 게시물 번호를 입력해주세요 : ");
+        int num = checkNum(sc.nextLine());
 
         Post post = postRepository.findPostByNumber(num);  // 창고에서 꺼내서
 
@@ -304,9 +304,9 @@ public class PostController {
         ArrayList<Comment> comments = commentRepository.getCommentsbyPostNumber(post.getNumber());
         postView.printPost(post, finedLike, comments);  // 서빙한테 넘겨줌
 
-        while(true) {
-
-            int detailNum = checkNum("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 좋아요, 3. 수정, 4. 삭제, 5. 목록으로) : ");
+        while (true) {
+            System.out.print("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 좋아요, 3. 수정, 4. 삭제, 5. 목록으로) : ");
+            int detailNum = checkNum(sc.nextLine());
 
             if (detailNum == 1) {
                 System.out.print("댓글 내용 : ");
@@ -370,7 +370,7 @@ public class PostController {
 
             } else if (detailNum == 3) {
 
-               // finedLike = likeRepository.findLikeById(post, userId);
+                // finedLike = likeRepository.findLikeById(post, userId);
                 if (userId.equals(post.getUserId())) {
 
                     System.out.print("제목 : ");
@@ -439,10 +439,12 @@ public class PostController {
 
     // command : sort
     public void sort() {
-        int object = checkNum("정렬 대상을 선택해주세요. (1. 번호, 2. 조회수) : ");
+        System.out.print("정렬 대상을 선택해주세요. (1. 번호, 2. 조회수) : ");
+        int object = checkNum(sc.nextLine());
 
-        while(true) {
-            int way = checkNum("정렬 방법을 선택해주세요. (1. 오름차순, 2. 내림차순) : ");
+        while (true) {
+            System.out.print("정렬 방법을 선택해주세요. (1. 오름차순, 2. 내림차순) : ");
+            int way = checkNum(sc.nextLine());
 
             ArrayList<Post> posts = postRepository.getPosts();
             commonContainer.setNowPage(1);
@@ -478,8 +480,9 @@ public class PostController {
     public void page() {
         list();
 
-        while(true) {
-            int pageCom = checkNum("페이징 명령어를 입력해주세요 (1. 이전, 2. 다음, 3. 선택, 4. 뒤로가기) : ");
+        while (true) {
+            System.out.print("페이징 명령어를 입력해주세요 (1. 이전, 2. 다음, 3. 선택, 4. 뒤로가기) : ");
+            int pageCom = checkNum(sc.nextLine());
 
             if (pageCom == 1) {
                 if (commonContainer.getNowPage() == 1) {
@@ -500,7 +503,9 @@ public class PostController {
                 commonContainer.setNowPage(commonContainer.getNowPage() + 1);
                 list();
             } else if (pageCom == 3) {
-                int movePage = checkNum("이동하실 페이지 번호를 입력해주세요 : ");
+                System.out.print("이동하실 페이지 번호를 입력해주세요 : ");
+                int movePage = checkNum(sc.nextLine());
+
                 int postSize = postRepository.getPosts().size();
 
                 if (movePage > getMaxPage(postSize)) {
@@ -544,17 +549,28 @@ public class PostController {
         return postRepository;
     }
 
-    public int checkNum (String request) {
-        int num;
-        while(true) {
-            try {
-                System.out.print(request);
-                num = Integer.parseInt(sc.nextLine());
-                return num;
-            } catch (NumberFormatException e) {
-                System.out.println("숫자를 입력해주세요.");
-            }
+    public int checkNum(String target) {
+        int defaultValue = -1;  // index는 -1이 없으므로 없는 값을 지정할 때 -1로 사용을 많이 함
+        // try - catch를 최대한 사용 안하는게 좋다. 순서대로 실행되는것이 아니라 되돌아가서 실행되기 때문에 가독성이 좋지 않음
+        // 몇가지 상황을 제외하고는 try - catch 사용 안하고 if로 처리 다 가능함.
+        try {
+            int parseInt = Integer.parseInt(target);
+            return parseInt;
+        } catch (NumberFormatException e) {
+            System.out.println("숫자를 입력해주세요.");
         }
+        return defaultValue;
+
+//        int num;
+//        while(true) {
+//            try {
+//                System.out.print(request);
+//                num = Integer.parseInt(sc.nextLine());
+//                return num;
+//            } catch (NumberFormatException e) {
+//                System.out.println("숫자를 입력해주세요.");
+//            }
+//        }
     }
 
     public void setComments(Comment comment) {

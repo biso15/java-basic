@@ -69,6 +69,8 @@ public class BoardApp {
                 memberController.signup();
             } else if (command.equals("login")) {
                 memberController.login();
+            } else if(command.equals("page")) {
+                articleController.page();
             }
         }
     }

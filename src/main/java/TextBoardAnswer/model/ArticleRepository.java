@@ -1,8 +1,9 @@
 package TextBoardAnswer.model;
 
-import java.util.ArrayList;
-
+import TextBoardAnswer.controller.Pagination;
 import TextBoardAnswer.util.Util;
+
+import java.util.*;
 
 // Dao
 // Repository
@@ -25,7 +26,13 @@ public class ArticleRepository {
         articles.add(a3);
         articles.add(a1);
 
-        lastArticleId = 4;
+        for(int i = 4; i < 100; i++) {
+            Article a = new Article(i, "제목" + i, "내용" + i, 2, Util.getCurrentDate());
+            articles.add(a);
+        }
+
+        lastArticleId = 104;
+
     }
 
     public Article findById(int id) {
@@ -76,4 +83,106 @@ public class ArticleRepository {
     public ArrayList<Article> findAllArticles() {
         return articles;
     }
+
+
+
+    public int getTotalArticleCount() {
+        return articles.size();
+    }
+
+    public ArrayList<Article> findPagedArticles(Pagination pagination) {
+        ArrayList<Article> pagedArticles = new ArrayList<>();
+
+        for(int i = pagination.getStartIdx(); i < pagination.getEndIdx(); i++) {
+            pagedArticles.add(articles.get(i));
+        }
+
+        return pagedArticles;
+    }
+
+    public void sortArticles(int sortTarget, int sortType) {
+        Collections.sort(articles, new SortFactory().getSort(sortTarget).setDirection(sortType));
+    }
 }
+
+
+class SortFactory {
+
+    Map<Integer, Sort> sortMap = new HashMap<>();
+
+    SortFactory() {
+        sortMap.put(1, new SortById());
+        sortMap.put(2, new SortByHit());
+    }
+    public Sort getSort(int sortTarget) {
+        return sortMap.get(sortTarget);
+    }
+}
+
+class Sort {
+    protected int order = 1;
+    Comparator<Article> setDirection(int direction) {
+        if(direction == 2) {
+            order = -1;
+        }
+        return (Comparator<Article>)this;
+    }
+}
+
+class SortById extends Sort implements Comparator<Article> {
+    @Override
+    public int compare(Article o1, Article o2) {
+        if(o1.getId() > o2.getId()) {
+            return order;
+        }
+        return -1 * order;
+    }
+}
+
+class SortByHit extends Sort implements Comparator<Article> {
+    @Override
+    public int compare(Article o1, Article o2) {
+        if(o1.getHit() > o2.getHit()) {
+            return order;
+        }
+        return -1 * order;
+    }
+}
+
+//    class SortById implements Comparator<Article> {
+//        private int order = 1;
+//
+//        SortById setDirection(int direction) {
+//            if(direction == 2) {
+//                order = -1;
+//            }
+//
+//            return this;
+//        }
+//
+//        @Override
+//        public int compare(Article o1, Article o2) {
+//            if(o1.getId() > o2.getId()) {
+//                return order;
+//            }
+//            return -1 * order;
+//        }
+//    }
+
+//    class SortByHit implements Comparator<Article> {
+//        private int order = 1;
+//
+//        SortByHit setDirection(int direction) {
+//            if(direction == 2) {
+//                order = -1;
+//            }
+//            return this;
+//        }
+//        @Override
+//        public int compare(Article o1, Article o2) {
+//            if(o1.getHit() > o2.getHit()) {
+//                return order;
+//            }
+//            return -1 * order;
+//        }
+//    }

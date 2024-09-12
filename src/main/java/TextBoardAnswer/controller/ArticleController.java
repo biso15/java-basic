@@ -17,6 +17,8 @@ public class ArticleController {
 
     Scanner scan = new Scanner(System.in);
 
+    private Pagination pagination = new Pagination();
+
     public void add() {
 
 //        if (loginedMember == null) {
@@ -24,7 +26,7 @@ public class ArticleController {
 //            return;
 //        }
 
-        if(isNotLogin()) return;
+        if (isNotLogin()) return;
 
         System.out.print("게시물 제목을 입력해주세요 : ");
         String title = scan.nextLine();
@@ -37,8 +39,10 @@ public class ArticleController {
     }
 
     public void list() {
-        ArrayList<Article> articles = articleRepository.findAllArticles();
-        articleView.printArticles(articles);
+//        ArrayList<Article> articles = articleRepository.findAllArticles();
+//        articleView.printArticles(articles);
+        ArrayList<Article> pagedArticles = articleRepository.findPagedArticles(pagination);
+        articleView.printArticles(pagedArticles, pagination);
     }
 
     public void update() {
@@ -91,7 +95,7 @@ public class ArticleController {
 
     public void detail() {
         // 중복 -> 함수로 만들어서 사용
-        if(isNotLogin()) return;
+        if (isNotLogin()) return;
 
         System.out.print("상세보기 할 게시물 번호를 입력해주세요 : ");
 
@@ -157,11 +161,11 @@ public class ArticleController {
         // 하나의 게시물에 한명의 유저가 체크 가능 -> 어떤 게시물에 어떤 회원이 좋아요 체크 했는지 기억해야 한다.
         // 좋아요 -> 어떤 게시물, 어떤 회원, 언제
         // 좋아요 여러개 -> 1번 게시물에 1번 유저, 1번 게시물에 2번 유저, 1번 게시물에 3번 유저, 2번 게시물에 1번 유저 ....
-        if(isNotLogin()) return;
+        if (isNotLogin()) return;
 
         Like like = likeRepository.getLikeByArticleIdAndMemberId(article.getId(), loginedMember.getId());
 
-        if(like == null) {
+        if (like == null) {
             likeRepository.insert(article.getId(), loginedMember.getId());
             System.out.println("해당 게시물을 좋아합니다.");
         } else {
@@ -176,7 +180,7 @@ public class ArticleController {
 
     public void deleteMyArticle(Article article, Member member) {
 
-        if(isNotLogin()) return;
+        if (isNotLogin()) return;
 
         System.out.print("정말 게시물을 삭제하시겠습니까? (y/n) : ");
         String isAgree = scan.nextLine();
@@ -190,7 +194,7 @@ public class ArticleController {
 
     public void addReply(Article article, Member member) {
 
-        if(isNotLogin()) return;
+        if (isNotLogin()) return;
 
         System.out.print("댓글 내용 : ");
         String body = scan.nextLine();
@@ -209,7 +213,7 @@ public class ArticleController {
 
     private void updateMyArticle(Article article, Member member, ArrayList<Reply> replies) {
 
-        if(isNotLogin()) return;
+        if (isNotLogin()) return;
 
         System.out.print("새로운 제목 : ");
         String title = scan.nextLine();
@@ -228,7 +232,7 @@ public class ArticleController {
         String keyword = scan.nextLine();
 
         ArrayList<Article> searchedArticles = articleRepository.findByTitle(keyword);
-        articleView.printArticles(searchedArticles);
+        articleView.printArticles(searchedArticles, pagination);
     }
 
     public void sort() {
@@ -236,99 +240,50 @@ public class ArticleController {
         int sortTarget = getParamInt(scan.nextLine(), -1);
         System.out.print("정렬 방법을 선택해주세요. (1. 오름차순,  2. 내림차순) : ");
         int sortType = getParamInt(scan.nextLine(), -1);
-        ArrayList<Article> allArticles = articleRepository.findAllArticles();
 
-//        if( sortTarget == 1 ) {
-//            Collections.sort(allArticles, new SortById().setDirection(sortType));
-//        } else {
-//            Collections.sort(allArticles, new SortByHit().setDirection(sortType));
-//        }
-        Collections.sort(allArticles, new SortFactory().getSort(sortTarget).setDirection(sortType));
 
-        articleView.printArticles(allArticles);
+////        if( sortTarget == 1 ) {
+////            Collections.sort(allArticles, new SortById().setDirection(sortType));
+////        } else {
+////            Collections.sort(allArticles, new SortByHit().setDirection(sortType));
+////        }
+//
+//
+//        Collections.sort(allArticles, new SortFactory().getSort(sortTarget).setDirection(sortType));
+
+        articleRepository.sortArticles(sortTarget, sortType);
+
+        ArrayList<Article> pagedArticles = articleRepository.findPagedArticles(pagination);
+        articleView.printArticles(pagedArticles, pagination);
     }
 
-
-    class SortFactory {
-
-        Map<Integer, Sort> sortMap = new HashMap<>();
-
-        SortFactory() {
-            sortMap.put(1, new SortById());
-            sortMap.put(2, new SortByHit());
-        }
-        public Sort getSort(int sortTarget) {
-            return sortMap.get(sortTarget);
-        }
-    }
-
-    class Sort {
-        protected int order = 1;
-        Comparator<Article> setDirection(int direction) {
-            if(direction == 2) {
-                order = -1;
+    public void page() {
+        while (true) {
+            System.out.print("페이징 명령어를 입력해주세요 ((1. 이전, 2. 다음, 3. 선택, 4. 뒤로가기): ");
+            int pageCmd = getParamInt(scan.nextLine(), -1);
+            switch (pageCmd) {
+                case 1:
+                    pagination.prevPage();
+                    break;
+                case 2:
+                    pagination.nextPage();
+                    break;
+                case 3:
+                    System.out.print("이동하실 페이지 번호를 입력해주세요 : ");
+                    int pageNo = getParamInt(scan.nextLine(), 1);
+                    pagination.selectPage(pageNo);
+                    break;
             }
-            return (Comparator<Article>)this;
-        }
-    }
 
-    class SortById extends Sort implements Comparator<Article> {
-        @Override
-        public int compare(Article o1, Article o2) {
-            if(o1.getId() > o2.getId()) {
-                return order;
+            ArrayList<Article> pagedArticles = articleRepository.findPagedArticles(pagination);
+            articleView.printArticles(pagedArticles, pagination);
+
+            if (pageCmd == 4) {
+                System.out.println("페이지 메뉴를 나갑니다.");
+                break;
             }
-            return -1 * order;
         }
     }
-
-    class SortByHit extends Sort implements Comparator<Article> {
-        @Override
-        public int compare(Article o1, Article o2) {
-            if(o1.getHit() > o2.getHit()) {
-                return order;
-            }
-            return -1 * order;
-        }
-    }
-
-//    class SortById implements Comparator<Article> {
-//        private int order = 1;
-//
-//        SortById setDirection(int direction) {
-//            if(direction == 2) {
-//                order = -1;
-//            }
-//
-//            return this;
-//        }
-//
-//        @Override
-//        public int compare(Article o1, Article o2) {
-//            if(o1.getId() > o2.getId()) {
-//                return order;
-//            }
-//            return -1 * order;
-//        }
-//    }
-
-//    class SortByHit implements Comparator<Article> {
-//        private int order = 1;
-//
-//        SortByHit setDirection(int direction) {
-//            if(direction == 2) {
-//                order = -1;
-//            }
-//            return this;
-//        }
-//        @Override
-//        public int compare(Article o1, Article o2) {
-//            if(o1.getHit() > o2.getHit()) {
-//                return order;
-//            }
-//            return -1 * order;
-//        }
-//    }
 
     public int getParamInt(String input, int defaulValue) {
 

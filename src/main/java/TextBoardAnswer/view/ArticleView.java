@@ -1,5 +1,6 @@
 package TextBoardAnswer.view;
 
+import TextBoardAnswer.controller.Pagination;
 import TextBoardAnswer.model.Article;
 import TextBoardAnswer.model.Like;
 import TextBoardAnswer.model.Member;
@@ -9,17 +10,30 @@ import java.util.ArrayList;
 
 public class ArticleView {
 
-    public void printArticles(ArrayList<Article> articles) {
+    public void printArticles(ArrayList<Article> list, Pagination pagination) {
         System.out.println("==================");
-        for (int i = 0; i < articles.size(); i++) {
-
-            Article article = articles.get(i);
+        for (int i = 0; i < list.size(); i++) {
+            Article article = list.get(i);
 
             System.out.printf("번호 : %d\n", article.getId());
             System.out.printf("제목 : %s\n", article.getTitle());
             System.out.printf("등록일 : %s\n", article.getRegDate());
             System.out.println("==================");
         }
+
+        if(pagination.hasPrevBlock())
+            System.out.print("<< ");
+
+        for(int i = pagination.getStartPageNo(); i <= pagination.getEndPageNo(); i++) {
+            if (i == pagination.getCurrentPageNo()) {
+                System.out.print("[" + i +"]" + " ");
+            } else {
+                System.out.print(i + " ");
+            }
+        }
+
+        if(pagination.hasNextBlock())
+            System.out.printf(">>");
     }
 
     public void printArticleDetail(Article article, Member member, ArrayList<Reply> replies, int likeCount, Like like) {
